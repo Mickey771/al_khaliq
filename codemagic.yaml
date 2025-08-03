@@ -9,7 +9,7 @@ workflows:
       groups:
         - google_play # <-- (Includes GCLOUD_SERVICE_ACCOUNT_CREDENTIALS)
       vars:
-        PACKAGE_NAME: "io.codemagic.flutteryaml" # <-- Put your package name here
+        PACKAGE_NAME: "com.microstatik.alKhaliq" # <-- Put your package name here
         GOOGLE_PLAY_TRACK: "alpha"
       flutter: stable
     scripts:
@@ -57,9 +57,9 @@ workflows:
     environment:
       ios_signing:
         distribution_type: app_store
-        bundle_identifier: com.example.alKhaliq
+        bundle_identifier: com.microstatik.alKhaliq
       vars:
-        APP_ID: 1111111111 # <-- Put your APP ID here
+        APP_ID: 6749515868 # <-- Put your APP ID here
       flutter: stable
       xcode: latest # <-- set to specific version e.g. 14.3, 15.0 to avoid unexpected updates.
       cocoapods: default
