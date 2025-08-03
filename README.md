@@ -1,6 +1,6 @@
 # al_khaliq
 
-A new Flutter project.
+A Music App
 
 ## Getting Started
 
