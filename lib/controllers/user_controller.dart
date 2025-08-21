@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/account_services.dart';
 import 'package:page_transition/page_transition.dart';
+import 'dart:async';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -39,17 +40,16 @@ class UserController extends GetxController {
     // await prefs.setString('refreshToken', refreshToken);
   }
 
-  getUser(token, userId) async {
+  Future<void> getUser(token, userId) async {
     loadingStatus.value = true;
     UserServices.getUser((status, response) {
+      loadingStatus.value = false;
       if (status) {
-        loadingStatus.value = false;
         user.value = response;
-        print(response);
+        print("User data loaded: $response");
       } else {
-        loadingStatus.value = false;
-        // showFlashError(context, response);
-        // Get.back();
+        print("Failed to load user data: $response");
+        // Handle error case - you might want to show a snackbar or handle this gracefully
       }
     }, token, userId);
   }

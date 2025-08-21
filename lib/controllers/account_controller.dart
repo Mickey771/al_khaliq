@@ -264,6 +264,9 @@ class AccountController extends GetxController {
       await prefs.setString('uid', uid);
 
       // Load user data (remove await Future.wait if methods don't return Futures)
+
+      await userController.getUser(token, uid);
+
       genreController.getGenres(token);
       musicController.getAllSongs(token);
       musicController.getNewReleases(token);
