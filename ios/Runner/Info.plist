@@ -13,8 +13,9 @@
     <!-- TODO Replace this value: -->
     <!-- Copied from GoogleService-Info.plist key CLIENT_ID -->
     <string>980313543309-lo2a1faagbbrr5l6oqgqdlbifltpgqen.apps.googleusercontent.com</string>
-        <key>GIDServerClientID</key>
-    <string>980313543309-lo2a1faagbbrr5l6oqgqdlbifltpgqen.apps.googleusercontent.com</string>
+    <key>GIDServerClientID</key>
+<!-- Web client ID from Google Cloud Console -->
+<string>980313543309-f5v5tpafso25t524oap3h3mcdge06s92.apps.googleusercontent.com</string>
     <!-- Put me in the [my_project]/ios/Runner/Info.plist file -->
 <!-- Google Sign-in Section -->
 <key>CFBundleURLTypes</key>
