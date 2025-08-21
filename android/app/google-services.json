@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "980313543309",
+    "project_id": "al-khalid",
+    "storage_bucket": "al-khalid.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:980313543309:android:2aa715d66119b04767c8c4",
+        "android_client_info": {
+          "package_name": "com.al_khaliq.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "980313543309-hj30ghf66splmuc5ipg1hut0j63hjrs4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.al_khaliq.app",
+            "certificate_hash": "da13dd19d71ebf4c8ca4434eea0a38f9cb48d5ad"
+          }
+        },
+        {
+          "client_id": "980313543309-f5v5tpafso25t524oap3h3mcdge06s92.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAM2MG6CbVq7SIzXt6AOrQi_FviebfSyks"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "980313543309-2sneggi19so35h9nunfqan2h94e4qdfv.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "980313543309-lo2a1faagbbrr5l6oqgqdlbifltpgqen.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.microstatik.alKhaliq"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
