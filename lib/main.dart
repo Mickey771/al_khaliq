@@ -7,7 +7,7 @@ import 'helpers/audio_handler.dart';
 import 'onboarding/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'firebase_options.dart'; // Ensure this import is correct
+import 'firebase_options.dart';
 
 late MyAudioHandler audioHandler;
 

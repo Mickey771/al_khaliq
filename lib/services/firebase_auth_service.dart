@@ -4,6 +4,7 @@ import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'dart:convert';
 import 'dart:math';
 import 'package:crypto/crypto.dart';
+//import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirebaseAuthService {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -17,6 +18,7 @@ class FirebaseAuthService {
 
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
+
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
@@ -27,6 +29,19 @@ class FirebaseAuthService {
       final User? user = result.user;
 
       if (user != null) {
+        // Firestore check
+        // final userDoc =
+        //     FirebaseFirestore.instance.collection("users").doc(user.uid);
+        // final snapshot = await userDoc.get();
+
+        // if (!snapshot.exists) {
+        //   await userDoc.set({
+        //     "email": user.email,
+        //     "name": user.displayName,
+        //     "createdAt": DateTime.now(),
+        //   });
+        // }
+
         final String? idToken = await user.getIdToken();
         return {
           'user': user,
@@ -55,6 +70,11 @@ class FirebaseAuthService {
           AppleIDAuthorizationScopes.fullName,
         ],
         nonce: nonce,
+        webAuthenticationOptions: WebAuthenticationOptions(
+          clientId: 'com.microstatik.alKhaliq.signin',
+          redirectUri:
+              Uri.parse('https://al-khalid.firebaseapp.com/__/auth/handler'),
+        ),
       );
 
       final oauthCredential = OAuthProvider("apple.com").credential(
