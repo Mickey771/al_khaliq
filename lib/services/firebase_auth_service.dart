@@ -59,10 +59,18 @@ class FirebaseAuthService {
   }
 
   // Apple Sign In
+  // Apple Sign In with detailed logging
+// Apple Sign In
   static Future<Map<String, dynamic>?> signInWithApple() async {
     try {
+      print('🔵 Starting Apple Sign In...');
       final rawNonce = generateNonce();
-      final nonce = sha256ofString(rawNonce);
+      final nonce = sha256ofString(rawNonce); // This should work now
+
+      print('🔵 Requesting Apple ID credential...');
+      print('🔵 Client ID: com.microstatik.alKhaliq.signin');
+      print(
+          '🔵 Redirect URI: https://al-khalid.firebaseapp.com/__/auth/handler');
 
       final appleCredential = await SignInWithApple.getAppleIDCredential(
         scopes: [
@@ -77,16 +85,21 @@ class FirebaseAuthService {
         ),
       );
 
+      print('🟢 Apple credential received successfully');
+
       final oauthCredential = OAuthProvider("apple.com").credential(
         idToken: appleCredential.identityToken,
         rawNonce: rawNonce,
       );
 
+      print('🔵 Signing in to Firebase...');
       final UserCredential result =
           await _auth.signInWithCredential(oauthCredential);
       final User? user = result.user;
 
       if (user != null) {
+        print('🟢 Firebase sign-in successful');
+
         final String? idToken = await user.getIdToken();
         return {
           'user': user,
@@ -98,14 +111,15 @@ class FirebaseAuthService {
           'uid': user.uid,
         };
       }
-    } catch (e) {
-      print('Apple Sign In Error: $e');
-      throw e;
+    } catch (e, stackTrace) {
+      print('🔴 Apple Sign In Error: $e');
+      print('🔴 Stack trace: $stackTrace');
+      rethrow;
     }
     return null;
   }
 
-  // Helper functions for Apple Sign In
+// Make sure these helper methods are at the bottom of your class
   static String generateNonce([int length = 32]) {
     const charset =
         '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
@@ -124,5 +138,10 @@ class FirebaseAuthService {
   static Future<void> signOut() async {
     await _auth.signOut();
     await _googleSignIn.signOut();
+  }
+
+  // Get Current User
+  static User? getCurrentUser() {
+    return _auth.currentUser;
   }
 }

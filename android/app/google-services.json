@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "980313543309",
+    "firebase_url": "https://al-khalid-default-rtdb.firebaseio.com",
     "project_id": "al-khalid",
     "storage_bucket": "al-khalid.firebasestorage.app"
   },
@@ -14,11 +15,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "980313543309-hj30ghf66splmuc5ipg1hut0j63hjrs4.apps.googleusercontent.com",
+          "client_id": "980313543309-dv503jok7lr9q19r8r9c0cubaaosa43m.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.al_khaliq.app",
-            "certificate_hash": "da13dd19d71ebf4c8ca4434eea0a38f9cb48d5ad"
+            "certificate_hash": "7dd63ce8774fbd51c95aa84eda7f2e7e676a3795"
           }
         },
         {
