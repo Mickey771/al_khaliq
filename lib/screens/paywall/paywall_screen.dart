@@ -1,4 +1,3 @@
-// lib/screens/paywall/custom_paywall.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -6,6 +5,7 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 import '../../controllers/subscription_controller.dart';
 import '../../services/revenue_cat_service.dart';
 import 'package:al_khaliq/screens/web_view.dart';
+import 'dart:io';
 
 class CustomPaywall extends StatefulWidget {
   const CustomPaywall({Key? key}) : super(key: key);
@@ -19,16 +19,21 @@ class _CustomPaywallState extends State<CustomPaywall> {
   final RevenueCatService _rc = RevenueCatService();
 
   // UI state
-  String? _monthlyPrice; // e.g. "$4.99 / month"
-  String? _yearlyPrice; // e.g. "$59.99 / year"
-  String? _monthlyProductId = 'monthly_premium:monthlypro';
-  String? _yearlyProductId = 'premium_yearly:yearly';
+  String? _monthlyPrice;
+  String? _yearlyPrice;
   bool _loading = false;
   String? _error;
 
-  // Placeholder links (you asked to use placeholders)
-  final String privacyUrl = 'https://example.com/privacy';
-  final String termsUrl = 'https://example.com/terms';
+  // ✅ FIXED: Single source of truth for product IDs
+  String get monthlyProductId =>
+      Platform.isIOS ? 'monthly_premium' : 'monthly_premium:monthlypro';
+
+  String get yearlyProductId =>
+      Platform.isIOS ? 'premium_yearly' : 'premium_yearly:yearly';
+
+  // Links
+  final String privacyUrl = 'https://al-khaliq.org/privacy';
+  final String termsUrl = 'https://al-khaliq.org/terms';
 
   @override
   void initState() {
@@ -43,162 +48,76 @@ class _CustomPaywallState extends State<CustomPaywall> {
     });
 
     try {
-      final dynamic offerings = await _rc.getOfferings();
+      final Offerings offerings = await _rc.getOfferings();
 
-      // Defensive parsing: the return type from Purchases.getOfferings()
-      // can vary depending on SDK versions. We'll try multiple strategies.
-      // 1) If it's an Offerings object (common newer shape)
-      // 2) If it's a List<Offering> (older shape you mentioned earlier)
-      // 3) As a final fallback, try to get product details directly
+      // Get current offering
+      final current = offerings.current;
 
-      bool foundMonthly = false;
-      bool foundYearly = false;
+      if (current != null && current.availablePackages.isNotEmpty) {
+        for (final package in current.availablePackages) {
+          final productId = package.storeProduct.identifier;
+          final price = package.storeProduct.priceString;
 
-      // Strategy A: Offerings (object with 'all' or 'current' maps)
-      try {
-        // Using dynamic access to avoid strict typing issues
-        if (offerings != null) {
-          // try 'all' map
-          final dynamic all = (offerings as dynamic).all;
-          if (all != null && (all as Map).isNotEmpty) {
-            // iterate offerings
-            for (final entry in (all as Map).entries) {
-              final dynamic offering = entry.value;
-              final dynamic packages =
-                  offering?.availablePackages ?? offering?.packages;
-              if (packages != null) {
-                for (final pack in packages) {
-                  final product = pack?.product;
-                  final id = product?.identifier ?? product?.productIdentifier;
-                  final price =
-                      (product?.presentedPrice ?? product?.priceString)
-                          ?.toString();
-                  if (id == _monthlyProductId && !foundMonthly) {
-                    _monthlyPrice = price ?? _monthlyPrice;
-                    foundMonthly = true;
-                  }
-                  if (id == _yearlyProductId && !foundYearly) {
-                    _yearlyPrice = price ?? _yearlyPrice;
-                    foundYearly = true;
-                  }
-                }
-              }
-            }
+          debugPrint('Found product: $productId - $price');
+
+          if (productId == monthlyProductId) {
+            _monthlyPrice = price;
+          } else if (productId == yearlyProductId) {
+            _yearlyPrice = price;
           }
         }
-      } catch (_) {
-        // ignore - we'll try other strategies
       }
 
-      // Strategy B: Offerings as a List<Offering>
-      if (!foundMonthly || !foundYearly) {
-        try {
-          if (offerings is List) {
-            for (final offering in offerings) {
-              final dynamic packages =
-                  offering?.availablePackages ?? offering?.packages;
-              if (packages != null) {
-                for (final pack in packages) {
-                  final product = pack?.product;
-                  final id = product?.identifier ?? product?.productIdentifier;
-                  final price =
-                      (product?.presentedPrice ?? product?.priceString)
-                          ?.toString();
-                  if (id == _monthlyProductId && !foundMonthly) {
-                    _monthlyPrice = price ?? _monthlyPrice;
-                    foundMonthly = true;
-                  }
-                  if (id == _yearlyProductId && !foundYearly) {
-                    _yearlyPrice = price ?? _yearlyPrice;
-                    foundYearly = true;
-                  }
-                }
-              }
-            }
-          }
-        } catch (_) {}
-      }
-
-      // Strategy C: enumerate offerings directly if present on the root
-      if (!foundMonthly || !foundYearly) {
-        try {
-          final dynamic current = (offerings as dynamic).current;
-          if (current != null) {
-            final dynamic packages =
-                current?.availablePackages ?? current?.packages;
-            if (packages != null) {
-              for (final pack in packages) {
-                final product = pack?.product;
-                final id = product?.identifier ?? product?.productIdentifier;
-                final price = (product?.presentedPrice ?? product?.priceString)
-                    ?.toString();
-                if (id == _monthlyProductId && !foundMonthly) {
-                  _monthlyPrice = price ?? _monthlyPrice;
-                  foundMonthly = true;
-                }
-                if (id == _yearlyProductId && !foundYearly) {
-                  _yearlyPrice = price ?? _yearlyPrice;
-                  foundYearly = true;
-                }
-              }
-            }
-          }
-        } catch (_) {}
-      }
-
-      // Final fallback: if still not found, set simple defaults (so UI shows something)
-      if (_monthlyPrice == null) _monthlyPrice = '\$4.99 / month';
-      if (_yearlyPrice == null) _yearlyPrice = '\$59.99 / year';
+      // Fallback prices if not found
+      _monthlyPrice ??= '\$4.99 / month';
+      _yearlyPrice ??= '\$59.99 / year';
 
       if (mounted) setState(() => _loading = false);
     } catch (e, st) {
+      debugPrint('Offerings load error: $e\n$st');
+
       if (mounted) {
         setState(() {
           _loading = false;
           _error = 'Failed to load offerings';
-          // keep default price placeholders
-          _monthlyPrice ??= '\$4.99 / month';
-          _yearlyPrice ??= '\$59.99 / year';
+          _monthlyPrice = '\$4.99 / month';
+          _yearlyPrice = '\$59.99 / year';
         });
       }
-      // You may also want to log e/st to your logger
-      debugPrint('Offerings load error: $e\n$st');
     }
   }
 
   Future<void> _purchase(String productId) async {
     if (_loading) return;
+
     setState(() => _loading = true);
+
     try {
-      // Use the purchaseProduct path — different SDK versions might return different types,
-      // so we avoid assigning the result to a strict type. Instead, after attempting purchase
-      // we fetch the latest CustomerInfo.
+      debugPrint('Attempting purchase: $productId');
+
       await Purchases.purchaseProduct(productId);
 
+      // Check subscription status
       await _controller.checkSubscription();
-      // After purchase, fetch customer info and update the controller
-      final CustomerInfo info = await _rc.getCustomerInfo();
-      _controller.customerInfo.value = info;
-      _controller.hasSubscription.value = _rc.hasActiveSubscription(info);
 
-      if (mounted) {
-        if (_controller.hasSubscription.value) {
+      if (_controller.hasSubscription.value) {
+        if (mounted) {
           Get.snackbar('Success', 'Subscription activated!');
-          // Use Get to navigate — ensure you only use context if mounted
           Get.offAllNamed('/home');
-        } else {
-          Get.snackbar(
-              'Info', 'Purchase complete but subscription not active yet.');
         }
       }
     } on PlatformException catch (e) {
-      // handle cancellations / errors
-      final code = e.code;
-      debugPrint('PlatformException during purchase: $code ${e.message}');
-      if (mounted) Get.snackbar('Purchase error', '${e.message ?? e.code}');
+      debugPrint('Purchase error: ${e.code} - ${e.message}');
+
+      if (e.code == '1') {
+        // User cancelled
+        if (mounted) Get.snackbar('Cancelled', 'Purchase was cancelled');
+      } else {
+        if (mounted) Get.snackbar('Error', e.message ?? 'Purchase failed');
+      }
     } catch (e) {
-      debugPrint('Unknown purchase error: $e');
-      if (mounted) Get.snackbar('Purchase error', '$e');
+      debugPrint('Unknown error: $e');
+      if (mounted) Get.snackbar('Error', 'Purchase failed');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -206,42 +125,44 @@ class _CustomPaywallState extends State<CustomPaywall> {
 
   Future<void> _restore() async {
     setState(() => _loading = true);
+
     try {
       await _rc.restorePurchases();
       await _controller.checkSubscription();
 
-      final CustomerInfo info = await _rc.getCustomerInfo();
-      _controller.customerInfo.value = info;
-      _controller.hasSubscription.value = _rc.hasActiveSubscription(info);
-
       if (mounted) {
         if (_controller.hasSubscription.value) {
+          Get.snackbar('Success', 'Purchases restored!');
           Get.offAllNamed('/home');
         } else {
-          Get.snackbar('Restore', 'No active subscription found.');
+          Get.snackbar('Info', 'No active subscription found');
         }
       }
     } catch (e) {
       debugPrint('Restore error: $e');
-      if (mounted) Get.snackbar('Restore error', '$e');
+      if (mounted) Get.snackbar('Error', 'Failed to restore');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
   }
 
-  Widget _buildHeader(BuildContext context) {
-    final theme = Theme.of(context);
+  Widget _buildHeader() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Upgrade to Pro',
-            style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: Colors.white)),
+        Text(
+          'Upgrade to Pro',
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
         SizedBox(height: 8),
-        Text('Ad-free, offline playback, unlimited skips',
-            style: TextStyle(color: Colors.white70)),
+        Text(
+          'Ad-free, offline playback, unlimited skips',
+          style: TextStyle(color: Colors.white70),
+        ),
         SizedBox(height: 20),
       ],
     );
@@ -264,59 +185,61 @@ class _CustomPaywallState extends State<CustomPaywall> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            // neon look: purple -> blue
             colors: [Colors.deepPurple.shade700, Colors.blue.shade400],
           ),
           boxShadow: [
             BoxShadow(
-                color: Colors.black.withOpacity(0.4),
-                blurRadius: 10,
-                offset: Offset(0, 6)),
-            BoxShadow(
-                color: Colors.white.withOpacity(0.03),
-                blurRadius: 1,
-                offset: Offset(0, -1)),
+              color: Colors.black.withOpacity(0.4),
+              blurRadius: 10,
+              offset: Offset(0, 6),
+            ),
           ],
         ),
         child: Row(
           children: [
-            // icon
             Container(
               width: 60,
               height: 60,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                gradient:
-                    LinearGradient(colors: [Colors.white24, Colors.white10]),
+                gradient: LinearGradient(
+                  colors: [Colors.white24, Colors.white10],
+                ),
               ),
               child: Icon(Icons.music_note, color: Colors.white, size: 30),
             ),
             SizedBox(width: 14),
-            // text
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title,
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16)),
+                  Text(
+                    title,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
                   SizedBox(height: 4),
-                  Text(subtitle,
-                      style: TextStyle(color: Colors.white70, fontSize: 12)),
+                  Text(
+                    subtitle,
+                    style: TextStyle(color: Colors.white70, fontSize: 12),
+                  ),
                 ],
               ),
             ),
-            // price + CTA
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(price,
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16)),
+                Text(
+                  price,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
                 SizedBox(height: 8),
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -324,12 +247,16 @@ class _CustomPaywallState extends State<CustomPaywall> {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Text('Get',
-                      style: TextStyle(
-                          color: Colors.black, fontWeight: FontWeight.bold)),
-                )
+                  child: Text(
+                    'Get',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
               ],
-            )
+            ),
           ],
         ),
       ),
@@ -338,7 +265,6 @@ class _CustomPaywallState extends State<CustomPaywall> {
 
   @override
   Widget build(BuildContext context) {
-    // dark background gradient (app music theme)
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
@@ -349,39 +275,32 @@ class _CustomPaywallState extends State<CustomPaywall> {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [
-                Color(0xFF0F0522), // deep purple-black
-                Color(0xFF0B1022),
-              ],
+              colors: [Color(0xFF0F0522), Color(0xFF0B1022)],
             ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // top bar
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
-                    onPressed: () {
-                      // dismiss paywall as modal style — stay in app
-                      if (mounted) Get.back();
-                    },
+                    onPressed: () => Get.back(),
                     icon: Icon(Icons.close, color: Colors.white),
                   ),
-                  Text('Pro',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold)),
-                  SizedBox(width: 48), // keep spacing
+                  Text(
+                    'Pro',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(width: 48),
                 ],
               ),
-
               SizedBox(height: 8),
-              _buildHeader(context),
-
-              // Price cards
+              _buildHeader(),
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
@@ -394,23 +313,18 @@ class _CustomPaywallState extends State<CustomPaywall> {
                       _buildPlanCard(
                         title: 'Monthly',
                         price: _monthlyPrice ?? '\$4.99 / month',
-                        productId: _monthlyProductId ?? 'monthly_premium',
+                        productId: monthlyProductId,
                         subtitle: 'Best for short term - cancel anytime',
-                        onTap: () =>
-                            _purchase(_monthlyProductId ?? 'monthly_premium'),
+                        onTap: () => _purchase(monthlyProductId),
                       ),
                       _buildPlanCard(
                         title: 'Yearly',
                         price: _yearlyPrice ?? '\$59.99 / year',
-                        productId: _yearlyProductId ?? 'premium_yearly',
+                        productId: yearlyProductId,
                         subtitle: 'Best value for heavy listeners',
-                        onTap: () =>
-                            _purchase(_yearlyProductId ?? 'premium_yearly'),
+                        onTap: () => _purchase(yearlyProductId),
                       ),
-
                       SizedBox(height: 14),
-
-                      // restore + benefits
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
@@ -419,93 +333,74 @@ class _CustomPaywallState extends State<CustomPaywall> {
                         ),
                         child: Column(
                           children: [
-                            Row(
-                              children: [
-                                Icon(Icons.check_circle_outline,
-                                    color: Colors.white70),
-                                SizedBox(width: 8),
-                                Expanded(
-                                    child: Text('Offline playback',
-                                        style:
-                                            TextStyle(color: Colors.white70))),
-                              ],
-                            ),
+                            _buildBenefit('Offline playback'),
                             SizedBox(height: 8),
-                            Row(
-                              children: [
-                                Icon(Icons.check_circle_outline,
-                                    color: Colors.white70),
-                                SizedBox(width: 8),
-                                Expanded(
-                                    child: Text('Ad-free listening',
-                                        style:
-                                            TextStyle(color: Colors.white70))),
-                              ],
-                            ),
+                            _buildBenefit('Ad-free listening'),
                             SizedBox(height: 12),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 TextButton(
                                   onPressed: _restore,
-                                  child: Text('Restore purchases',
-                                      style: TextStyle(color: Colors.white)),
+                                  child: Text(
+                                    'Restore purchases',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
                                 ),
                                 Row(
                                   children: [
                                     TextButton(
-                                      onPressed: () {
-                                        // open placeholder links via Get.toNamed or url_launcher if available
-                                        // for now show a snackbar with placeholder
-                                        Get.to(() => WebViewPage(
-                                            title: "terms of Service",
-                                            url: termsUrl));
-                                      },
-                                      child: Text('terms of Service',
-                                          style:
-                                              TextStyle(color: Colors.white70)),
+                                      onPressed: () => Get.to(() => WebViewPage(
+                                            title: "Terms of Service",
+                                            url: termsUrl,
+                                          )),
+                                      child: Text(
+                                        'Terms',
+                                        style: TextStyle(color: Colors.white70),
+                                      ),
                                     ),
                                     Text(' • ',
                                         style:
                                             TextStyle(color: Colors.white24)),
                                     TextButton(
-                                      onPressed: () {
-                                        Get.to(() => WebViewPage(
+                                      onPressed: () => Get.to(() => WebViewPage(
                                             title: "Privacy Policy",
-                                            url: privacyUrl));
-                                      },
-                                      child: Text('Privacy Policy',
-                                          style:
-                                              TextStyle(color: Colors.white70)),
+                                            url: privacyUrl,
+                                          )),
+                                      child: Text(
+                                        'Privacy',
+                                        style: TextStyle(color: Colors.white70),
+                                      ),
                                     ),
                                   ],
-                                )
+                                ),
                               ],
-                            )
+                            ),
                           ],
                         ),
                       ),
-
-                      SizedBox(height: 24),
-
-                      // Note about Apple review compliance
-                      Text(
-                        'This paywall blocks access until a subscription is purchased. Links to Terms & Privacy provided (placeholder).',
-                        style: TextStyle(color: Colors.white54, fontSize: 12),
-                      ),
-
                       SizedBox(height: 40),
                     ],
                   ),
                 ),
               ),
-
-              // Bottom CTA area: small legal + restore again
               if (_loading) LinearProgressIndicator(),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildBenefit(String text) {
+    return Row(
+      children: [
+        Icon(Icons.check_circle_outline, color: Colors.white70),
+        SizedBox(width: 8),
+        Expanded(
+          child: Text(text, style: TextStyle(color: Colors.white70)),
+        ),
+      ],
     );
   }
 }
