@@ -2,17 +2,16 @@ import 'package:al_khaliq/controllers/genre_controller.dart';
 import 'package:al_khaliq/controllers/music_controller.dart';
 import 'package:al_khaliq/controllers/playlist_controller.dart';
 import 'package:al_khaliq/controllers/user_controller.dart';
+import 'package:al_khaliq/controllers/subscription_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-//import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-//import '../onboarding/auth_board.dart';
 import '../onboarding/login.dart';
-import '../screens/views.dart';
+// import '../screens/views.dart';
 import '../services/account_services.dart';
 import '../services/firebase_auth_service.dart';
-import 'dart:math';
+import '../services/revenue_cat_service.dart';
 
 class AccountController extends GetxController {
   TextEditingController get firstName => _firstName;
@@ -29,7 +28,15 @@ class AccountController extends GetxController {
 
   RxBool loadingStatus = false.obs;
 
-  signInWithGoogle({context}) async {
+  // Helper method to get or create controllers safely
+  T _getOrPutController<T extends GetxController>(T Function() builder) {
+    if (Get.isRegistered<T>()) {
+      return Get.find<T>();
+    }
+    return Get.put(builder());
+  }
+
+  Future<void> signInWithGoogle({context}) async {
     try {
       loadingStatus.value = true;
 
@@ -158,24 +165,37 @@ class AccountController extends GetxController {
       // Sign out from Firebase
       await FirebaseAuthService.signOut();
 
-      // Your existing signOut code...
-      if (token != null) {
-        // AccountServices.logoutUser(token);
-      }
-
+      // Clear SharedPreferences
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.clear();
 
-      Get.delete<UserController>(force: true);
-      Get.delete<GenreController>(force: true);
-      Get.delete<MusicController>(force: true);
-      Get.delete<PlaylistController>(force: true);
+      // Delete controllers in correct order
+      // Don't delete AccountController or SubscriptionController as they're permanent
+      if (Get.isRegistered<PlaylistController>()) {
+        Get.delete<PlaylistController>(force: true);
+      }
+      if (Get.isRegistered<MusicController>()) {
+        Get.delete<MusicController>(force: true);
+      }
+      if (Get.isRegistered<GenreController>()) {
+        Get.delete<GenreController>(force: true);
+      }
+      if (Get.isRegistered<UserController>()) {
+        Get.delete<UserController>(force: true);
+      }
 
       loadingStatus.value = false;
+
+      // Clear text fields
+      _firstName.clear();
+      _lastName.clear();
+      _email.clear();
+      _password.clear();
+
       Get.offAll(() => Login());
     } catch (e) {
       loadingStatus.value = false;
-      print('Sign out error: ${e.toString()}');
+      debugPrint('Sign out error: ${e.toString()}');
       Get.offAll(() => Login());
     }
   }
@@ -193,7 +213,7 @@ class AccountController extends GetxController {
       loadingStatus.value = true;
       AccountServices.registerUser(
         (status, response) {
-          print('==> $response');
+          debugPrint('==> $response');
           if (status) {
             loadingStatus.value = false;
             signIn(context: context);
@@ -239,31 +259,33 @@ class AccountController extends GetxController {
     }
   }
 
-  setUser(context, token, {uid, isFirst = false}) async {
+  setUser(context, token,
+      {uid, isFirst = false, bool shouldNavigate = true}) async {
     try {
-      // Validate inputs
-      if (token == null || token.isEmpty) {
-        throw Exception('Invalid token');
-      }
-      if (uid == null || uid.isEmpty) {
-        throw Exception('Invalid user ID');
-      }
+      if (token == null || token.isEmpty) throw Exception('Invalid token');
+      if (uid == null || uid.isEmpty) throw Exception('Invalid user ID');
 
-      var userController = Get.put(UserController());
-      var genreController = Get.put(GenreController());
-      var musicController = Get.put(MusicController());
-      var playlistController = Get.put(PlaylistController());
+      var userController = _getOrPutController(() => UserController());
+      var genreController = _getOrPutController(() => GenreController());
+      var musicController = _getOrPutController(() => MusicController());
+      var playlistController = _getOrPutController(() => PlaylistController());
 
-      print("================");
+      debugPrint("================");
+      debugPrint('Setting user with token: $token');
+      debugPrint('User ID: $uid');
+
       userController.setToken(token);
-      print('New token - $token');
 
-      // Save to SharedPreferences with proper error handling
+      /// >>> RevenueCat integration added here <<<
+      await RevenueCatService().updateUserId(uid);
+      final subController = Get.find<SubscriptionController>();
+      await subController.checkSubscription();
+
+      /// >>> end addition <<<
+
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('token', token);
       await prefs.setString('uid', uid);
-
-      // Load user data (remove await Future.wait if methods don't return Futures)
 
       await userController.getUser(token, uid);
 
@@ -275,8 +297,14 @@ class AccountController extends GetxController {
 
       loadingStatus.value = false;
 
-      // Navigate using GetX for consistency
-      Get.offAll(() => Views(), transition: Transition.fadeIn);
+      // NAVIGATION HANDLING HERE
+      if (shouldNavigate) {
+        if (subController.hasSubscription.value) {
+          Get.offAllNamed('/home');
+        } else {
+          Get.offAllNamed('/paywall');
+        }
+      }
     } catch (e) {
       loadingStatus.value = false;
       _handleError('Setup failed: ${e.toString()}');
@@ -284,7 +312,7 @@ class AccountController extends GetxController {
   }
 
   void _handleError(dynamic error) {
-    print('Error: $error');
+    debugPrint('Error: $error');
 
     // Extract meaningful error message
     String errorMessage = 'An error occurred';

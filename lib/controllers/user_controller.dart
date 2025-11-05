@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../services/account_services.dart';
 import 'package:page_transition/page_transition.dart';
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -24,7 +25,7 @@ class UserController extends GetxController {
 
   setToken(token) {
     _token = token;
-    print("=====$_token");
+    debugPrint("=====$_token");
   }
 
   setRefresh(refreshToken) => _refreshToken = refreshToken;
@@ -46,9 +47,9 @@ class UserController extends GetxController {
       loadingStatus.value = false;
       if (status) {
         user.value = response;
-        print("User data loaded: $response");
+        debugPrint("User data loaded: $response");
       } else {
-        print("Failed to load user data: $response");
+        debugPrint("Failed to load user data: $response");
         // Handle error case - you might want to show a snackbar or handle this gracefully
       }
     }, token, userId);
@@ -58,6 +59,6 @@ class UserController extends GetxController {
 
   void setUser(Map<String, dynamic> newUser) {
     user.value = newUser;
-    print("User saved in controller: $newUser");
+    debugPrint("User saved in controller: $newUser");
   }
 }

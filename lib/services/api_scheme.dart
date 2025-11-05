@@ -6,14 +6,11 @@ import 'package:http/http.dart' as http;
 
 import 'package:http_parser/http_parser.dart';
 
-
-
-
 class ApiServices {
-  static makePostRequest({apiUrl, data, token}) async {      print('Auth - $token');
+  static makePostRequest({apiUrl, data, token}) async {
+    print('Auth - $token');
 
-
-  final uri = Uri.parse(apiUrl);
+    final uri = Uri.parse(apiUrl);
     final jsonString = json.encode(data);
     var headers;
     if (token == null) {
@@ -31,10 +28,10 @@ class ApiServices {
     return await http.post(uri, body: jsonString, headers: headers);
   }
 
+  static makeDeleteRequest({apiUrl, data, token}) async {
+    print('Auth - $token');
 
-  static makeDeleteRequest({apiUrl, data, token}) async {      print('Auth - $token');
-
-  final uri = Uri.parse(apiUrl);
+    final uri = Uri.parse(apiUrl);
     final jsonString = json.encode(data);
     var headers;
     if (token == null) {
@@ -52,9 +49,10 @@ class ApiServices {
     return await http.delete(uri, body: jsonString, headers: headers);
   }
 
-  static makePatchRequest({apiUrl, data, token}) async {      print('Auth - $token');
+  static makePatchRequest({apiUrl, data, token}) async {
+    print('Auth - $token');
 
-  final uri = Uri.parse(apiUrl);
+    final uri = Uri.parse(apiUrl);
     final jsonString = json.encode(data);
     var headers;
 
@@ -68,17 +66,18 @@ class ApiServices {
     return await http.patch(uri, body: jsonString, headers: headers);
   }
 
-  static makeGetRequest({apiUrl, token}) async {      print('Auth - $token');
+  static makeGetRequest({apiUrl, token}) async {
+    print('Auth - $token');
 
-  var uri = Uri.parse(apiUrl);
+    var uri = Uri.parse(apiUrl);
     var headers;
 
     headers = {
-    // 'Accept': '*/*',
-    'Authorization': 'Bearer $token',
-    // HttpHeaders.authorizationHeader: 'Bearer $token',
-    'Content-Type': 'application/json'
-  };
+      // 'Accept': '*/*',
+      'Authorization': 'Bearer $token',
+      // HttpHeaders.authorizationHeader: 'Bearer $token',
+      'Content-Type': 'application/json'
+    };
 
     return await http.get(uri, headers: headers);
   }
@@ -101,7 +100,7 @@ class ApiServices {
         print('Success');
         return body;
       } else {
-        print('i am here now ERROR');
+        print('INVALID LOGIN');
         return ApiServices.handleError(response);
       }
     } catch (e) {
@@ -116,7 +115,6 @@ class ApiServices {
 
   static initialisePostMultiPart(
       {required data, required String url, token, banner}) async {
-
     Map<String, String> headers = {
       'accept': 'application/json',
       'token': '$token',
@@ -133,14 +131,14 @@ class ApiServices {
 
       var request = http.MultipartRequest("POST", uri);
 
-
       request.fields.addAll(data);
 
       request.headers.addAll(headers);
 
       for (var i in banner) {
         print(i.path);
-        request.files.add(await http.MultipartFile.fromPath('banner', i.path, contentType: MediaType('image', 'jpeg')));
+        request.files.add(await http.MultipartFile.fromPath('banner', i.path,
+            contentType: MediaType('image', 'jpeg')));
       }
 
       var response = await request.send();
@@ -151,7 +149,6 @@ class ApiServices {
       print(response.statusCode);
       print(response.stream);
       print(response.request);
-
 
       if (ApiServices.isRequestSuccessful(response.statusCode)) {
         print('Success');
@@ -238,7 +235,8 @@ class ApiServices {
       print('ddf');
 
       print(url);
-      http.Response response = await ApiServices.makeGetRequest(apiUrl: url, token: token);
+      http.Response response =
+          await ApiServices.makeGetRequest(apiUrl: url, token: token);
 
       print(response.headers);
       print(response.request);
@@ -261,28 +259,36 @@ class ApiServices {
   }
 
   static handleError(http.Response response) {
-    var errorMessage = jsonDecode(response.body)['error'] != null
-        ? jsonDecode(response.body)['error'].toString()
-        : jsonDecode(response.body)['message'] != null
-            ? jsonDecode(response.body)['message'].toString()
-            : (jsonDecode(response.body)['data'] != null &&
-                    jsonDecode(response.body)['data']['detail'] != null)
-                ? jsonDecode(response.body)['data']['detail'].toString()
-                : (jsonDecode(response.body)['data'] != null &&
-                        jsonDecode(response.body)['data']['errors'] != null)
-                    ? jsonDecode(response.body)['data']['errors'].toString()
-                    : jsonDecode(response.body)['result']['errors'] != null
-                        ? jsonDecode(response.body)['result']['errors']
-                            .toString()
-                        : jsonDecode(response.body)['result']['detail'] != null
-                            ? jsonDecode(response.body)['result']['detail']
-                                .toString()
-                            : 'Failed response';
+    String errorMessage;
+    try {
+      var responseBody = jsonDecode(response.body);
+      if (responseBody['error'] != null) {
+        errorMessage = responseBody['error'].toString();
+      } else if (responseBody['message'] != null) {
+        errorMessage = responseBody['message'].toString();
+      } else if (responseBody['data'] != null &&
+          responseBody['data']['detail'] != null) {
+        errorMessage = responseBody['data']['detail'].toString();
+      } else if (responseBody['data'] != null &&
+          responseBody['data']['errors'] != null) {
+        errorMessage = responseBody['data']['errors'].toString();
+      } else if (responseBody['result'] != null &&
+          responseBody['result']['errors'] != null) {
+        errorMessage = responseBody['result']['errors'].toString();
+      } else if (responseBody['result'] != null &&
+          responseBody['result']['detail'] != null) {
+        errorMessage = responseBody['result']['detail'].toString();
+      } else {
+        errorMessage = 'Failed response';
+      }
+    } catch (e) {
+      errorMessage = 'Failed to parse error response';
+    }
 
     print(errorMessage);
     switch (response.statusCode) {
       case 400:
-        throw (errorMessage);
+        throw ('$errorMessage');
 
       case 401:
         throw 'Unauthorized request - $errorMessage';
@@ -298,7 +304,7 @@ class ApiServices {
       case 500:
         throw 'Server error - $errorMessage';
       default:
-        throw 'Error occurred with code : $response';
+        throw 'Error occurred with code : ${response.statusCode}';
     }
   }
 

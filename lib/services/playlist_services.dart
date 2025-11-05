@@ -16,7 +16,6 @@ class PlaylistServices {
       Function callback,token, userId ) async {
     var response =
     await ApiServices.initialiseGetRequest(url: "$getPlaylistUrl$userId", token: token);
-    print(response);
     if (response is String) {
       callback(false, response);
     } else {
@@ -28,7 +27,6 @@ class PlaylistServices {
       Function callback,token, playlistId ) async {
     var response =
     await ApiServices.initialiseGetRequest(url: "$getPlaylistSongsUrl$playlistId", token: token);
-    print(response);
     if (response is String) {
       callback(false, response);
     } else {
@@ -41,7 +39,6 @@ class PlaylistServices {
       Function callback,token ) async {
     var response =
     await ApiServices.initialiseGetRequest(url: recentlyPlayedUrl, token: token);
-    print(response);
     if (response is String) {
       callback(false, response);
     } else {
@@ -54,7 +51,6 @@ class PlaylistServices {
       Function callback,token ) async {
     var response =
     await ApiServices.initialiseGetRequest(url: myFavouritesUrl, token: token);
-    print(response);
     if (response is String) {
       callback(false, response);
     } else {
@@ -67,7 +63,6 @@ class PlaylistServices {
       Function callback,token, data ) async {
     var response =
     await ApiServices.initialisePostRequest(data: data, url: addFavouriteUrl, token: token);
-    print(response);
     if (response is String) {
       callback(false, response);
     } else {
@@ -80,7 +75,6 @@ class PlaylistServices {
       Function callback,token, data ) async {
     var response =
     await ApiServices.initialisePostRequest(data: data, url: removeFromFavoriteUrl, token: token);
-    print(response);
     if (response is String) {
       callback(false, response);
     } else {

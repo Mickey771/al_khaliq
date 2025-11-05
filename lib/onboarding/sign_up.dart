@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:al_khaliq/onboarding/login.dart';
-import 'package:al_khaliq/screens/home.dart';
+import 'package:al_khaliq/screens/home_screen.dart';
 import 'package:al_khaliq/screens/views.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

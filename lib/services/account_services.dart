@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'api_docs.dart';
@@ -9,172 +9,217 @@ import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 
 class AccountServices {
-// Add this to AccountServices class
-  // static socialLogin(
-  //   Function callback, {
-  //   required String provider, // 'google' or 'apple'
-  //   required String idToken,
-  //   required String email,
-  //   required String name,
-  //   required String firebaseUid,
-  // }) async {
-  //   var data = {
-  //     "provider": provider,
-  //     "id_token": idToken,
-  //     "email": email,
-  //     "name": name,
-  //     "firebase_uid": firebaseUid,
-  //   };
+  static socialLogin(
+    Function callback, {
+    required String provider,
+    required String idToken,
+    required String email,
+    required String name,
+    required String firebaseUid,
+  }) async {
+    try {
+      debugPrint('🔐 Social Login - Provider: $provider, Email: $email');
 
-  //   var response = await ApiServices.initialisePostRequest(
-  //       url: //socialLoginUrl, // Add this URL to your api_docs.dart
-  //       data: data);
+      var data = {
+        "provider": provider,
+        "id_token": idToken,
+        "email": email,
+        "name": name,
+        "firebase_uid": firebaseUid,
+      };
 
-  //   if (response is String) {
-  //     callback(false, response);
-  //   } else {
-  //     callback(true, response);
-  //   }
-  // }
+      var response = await ApiServices.initialisePostRequest(
+        url: socialurl,
+        data: data,
+      );
+
+      if (response is String) {
+        debugPrint('❌ Social Login Failed: $response');
+        callback(false, response);
+      } else {
+        debugPrint('✅ Social Login Success');
+        callback(true, response);
+      }
+    } catch (e) {
+      debugPrint('❌ Social Login Exception: $e');
+      callback(false, 'Social login failed: ${e.toString()}');
+    }
+  }
 
   static loginUser(
     Function callback, {
-    email,
-    password,
+    required String email,
+    required String password,
   }) async {
-    var data = {"email": email, "password": password};
-    print(data);
-    var response =
-        await ApiServices.initialisePostRequest(url: loginUrl, data: data);
-    print(response);
-    if (response is String) {
-      callback(false, response);
-    } else {
-      callback(true, response);
+    try {
+      debugPrint('🔐 Login User - Email: $email');
+
+      var data = {
+        "email": email,
+        "password": password,
+      };
+
+      var response = await ApiServices.initialisePostRequest(
+        url: loginUrl,
+        data: data,
+      );
+
+      // FIX: Properly handle response - don't pass to debugPrint directly
+      debugPrint('Login Response Type: ${response.runtimeType}');
+      if (response is Map) {
+        debugPrint('Login Response: ${jsonEncode(response)}');
+      } else {
+        debugPrint('Login Response: $response');
+      }
+
+      if (response is String) {
+        debugPrint('❌ Login Failed: $response');
+        callback(false, response);
+      } else {
+        debugPrint('✅ Login Success');
+        callback(true, response);
+      }
+    } catch (e) {
+      debugPrint('❌ Login Exception: $e');
+      callback(false, 'Login failed: ${e.toString()}');
     }
   }
 
-  // static changePassword(
-  //     Function callback,data,token) async {
-  //   var response =
-  //   await ApiServices.initialisePostRequest(url: changePasswordUrl, token: token,data: data);
-  //   print(response);
-  //   if (response is String) {
-  //     callback(false, response);
-  //   } else {
-  //     callback(true, response);
-  //   }
-  // }
+  static refreshToken(Function callback, String refreshToken) async {
+    try {
+      debugPrint('🔄 Refreshing Token');
 
-  // static deleteAccount(
-  //     Function callback,data,token) async {
-  //   var response =
-  //   await ApiServices.initialiseDeleteRequest(url: changePasswordUrl, token: token,data: data);
-  //   print(response);
-  //   if (response is String) {
-  //     callback(false, response);
-  //   } else {
-  //     callback(true, response);
-  //   }
-  // }
+      var data = {
+        "refresh_token": refreshToken,
+      };
 
-  static refreshToken(Function callback, refreshToken) async {
-    var data = {
-      "refresh_token": refreshToken,
-    };
-    var response =
-        await ApiServices.initialisePostRequest(url: refreshUrl, data: data);
-    print(response);
-    if (response is String) {
-      callback(false, response);
-    } else {
-      callback(true, response);
+      var response = await ApiServices.initialisePostRequest(
+        url: refreshUrl,
+        data: data,
+      );
+
+      // FIX: Properly handle response
+      if (response is Map) {
+        debugPrint('Refresh Response: ${jsonEncode(response)}');
+      } else {
+        debugPrint('Refresh Response: $response');
+      }
+
+      if (response is String) {
+        debugPrint('❌ Refresh Failed: $response');
+        callback(false, response);
+      } else {
+        debugPrint('✅ Refresh Success');
+        callback(true, response);
+      }
+    } catch (e) {
+      debugPrint('❌ Refresh Exception: $e');
+      callback(false, 'Token refresh failed: ${e.toString()}');
     }
   }
 
-  static registerUser(Function callback, {email, password, name}) async {
-    var data = {
-      "email": email,
-      "password": password,
-      "name": name,
-      "password_confirmation": password,
-    };
-    var response =
-        await ApiServices.initialisePostRequest(url: registerUrl, data: data);
-    print(response);
-    if (response is String) {
-      callback(false, response);
-    } else {
-      callback(true, response);
+  static registerUser(
+    Function callback, {
+    required String email,
+    required String password,
+    required String name,
+  }) async {
+    try {
+      debugPrint('📝 Register User - Email: $email, Name: $name');
+
+      var data = {
+        "email": email,
+        "password": password,
+        "name": name,
+        "password_confirmation": password,
+      };
+
+      debugPrint('Registration data prepared, sending request...');
+
+      var response = await ApiServices.initialisePostRequest(
+        url: registerUrl,
+        data: data,
+      );
+
+      // FIX: This is line 102 - properly handle Map response
+      debugPrint('Register Response Type: ${response.runtimeType}');
+      if (response is Map) {
+        debugPrint('Register Response: ${jsonEncode(response)}');
+      } else {
+        debugPrint('Register Response: $response');
+      }
+
+      if (response is String) {
+        debugPrint('❌ Registration Failed: $response');
+        callback(false, response);
+      } else {
+        debugPrint('✅ Registration Success');
+        callback(true, response);
+      }
+    } catch (e) {
+      debugPrint('❌ Registration Exception: $e');
+      callback(false, 'Registration failed: ${e.toString()}');
     }
   }
 
-  // static loginOutUser(
-  //     Function callback, token) async {
-  //   var data = {};
-  //   var response =
-  //   await ApiServices.initialisePostRequest(url: logoutUrl, data: data, token: token);
-  //   print(response);
-  //   if (response is String) {
-  //     callback(false, response);
-  //   } else {
-  //     callback(true, response);
-  //   }
-  // }
+  static uploadFile(
+    Function callback,
+    String url, {
+    String? token,
+    required String title,
+    required List images,
+  }) async {
+    try {
+      debugPrint('📤 Upload File - URL: $url, Title: $title');
 
-  // static resendVerificationEmail(
-  //     Function callback,data) async {
-  //   var response =
-  //   await ApiServices.initialisePostRequest(url: resentVerificationUrl, data: data);
-  //   print(response);
-  //   if (response is String) {
-  //     callback(false, response);
-  //   } else {
-  //     callback(true, response);
-  //   }
-  // }
+      Map<String, String> headers = {
+        "Accept": "application/json",
+      };
 
-  static uploadFile(Function callback, url, {token, title, images}) async {
-    Map<String, String> headers = {
-      "Accept": "application/json",
-      "Authorization": "Bearer $token"
-    };
+      if (token != null && token.isNotEmpty) {
+        headers["Authorization"] = "Bearer $token";
+      }
 
-    var uri = Uri.parse(url);
+      var uri = Uri.parse(url);
+      var request = http.MultipartRequest("POST", uri);
 
-    var request = http.MultipartRequest("POST", uri);
+      debugPrint('Adding files to request...');
+      for (var i in images) {
+        debugPrint('Adding file: ${i.path}');
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            title,
+            i.path,
+            contentType: MediaType('image', 'jpeg'),
+          ),
+        );
+      }
 
-    // if(data != null){
-    //   request.fields.addAll(
-    //       data
-    //   );
-    // }
+      request.headers.addAll(headers);
 
-    print("ds");
-    for (var i in images) {
-      print(i.path);
-      request.files.add(await http.MultipartFile.fromPath(title, i.path,
-          contentType: MediaType('image', 'jpeg')));
-    }
+      debugPrint('Sending multipart request...');
+      var response = await request.send().timeout(
+        const Duration(seconds: 60),
+        onTimeout: () {
+          throw Exception('File upload timeout');
+        },
+      );
 
-    print("dssss");
+      debugPrint('Upload Response Status: ${response.statusCode}');
 
-    request.headers.addAll(headers);
-    print("dsssqes");
-
-    var response = await request.send();
-
-    print("dssss");
-
-    if (response.statusCode.toString() == '200' ||
-        response.statusCode.toString() == '201') {
-      response.stream.transform(utf8.decoder).listen((value) {
-        log(value);
-        var body = jsonDecode(value);
-        callback(true, body);
-      });
-    } else {
-      callback(false, response);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        response.stream.transform(utf8.decoder).listen((value) {
+          log('Upload Success: $value');
+          var body = jsonDecode(value);
+          callback(true, body);
+        });
+      } else {
+        debugPrint('❌ Upload Failed: ${response.statusCode}');
+        callback(false, 'Upload failed with status: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('❌ Upload Exception: $e');
+      callback(false, 'File upload failed: ${e.toString()}');
     }
   }
 }

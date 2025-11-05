@@ -1,12 +1,9 @@
-
 import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:audio_session/audio_session.dart';
 
 class MyAudioHandler extends BaseAudioHandler with SeekHandler {
   final player = AudioPlayer();
-
-
 
   MyAudioHandler() {
     _init();
@@ -18,12 +15,12 @@ class MyAudioHandler extends BaseAudioHandler with SeekHandler {
     await player.play();
   }
 
-
   @override
   Future<void> pause() async {
     print(">>> PAUSE triggered");
     await player.pause();
   }
+
   @override
   Future<void> stop() => player.stop();
 
@@ -35,8 +32,6 @@ class MyAudioHandler extends BaseAudioHandler with SeekHandler {
 
   @override
   Future<void> skipToPrevious() => player.seekToPrevious();
-
-
 
   @override
   Future<void> setShuffleMode(AudioServiceShuffleMode shuffleMode) async {
@@ -51,7 +46,8 @@ class MyAudioHandler extends BaseAudioHandler with SeekHandler {
   @override
   Future<void> updateQueue(List<MediaItem> newQueue) async {
     queue.add(newQueue); // updates the stream
-    final audioSources = newQueue.map((item) => AudioSource.uri(Uri.parse(item.id))).toList();
+    final audioSources =
+        newQueue.map((item) => AudioSource.uri(Uri.parse(item.id))).toList();
     await player.setAudioSource(
       ConcatenatingAudioSource(children: audioSources),
       initialIndex: 0,
@@ -82,18 +78,17 @@ class MyAudioHandler extends BaseAudioHandler with SeekHandler {
   Future<void> loadAndPlay(MediaItem item) async {
     final index = queue.value.indexWhere((q) => q.id == item.id);
     if (index != -1) {
-
       final audioSources = queue.value
           .map((item) => AudioSource.uri(Uri.parse(item.id)))
           .toList();
       mediaItem.add(item); // Sync media item for notification
       await player.seek(Duration.zero, index: index);
-      await player.setAudioSource(ConcatenatingAudioSource(children: audioSources),
+      await player.setAudioSource(
+          ConcatenatingAudioSource(children: audioSources),
           initialIndex: index);
       await player.play();
     }
   }
-
 
   PlaybackState _transformEvent(PlaybackEvent event) {
     return PlaybackState(
@@ -133,5 +128,4 @@ class MyAudioHandler extends BaseAudioHandler with SeekHandler {
       },
     );
   }
-
 }
