@@ -4,6 +4,7 @@ import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'dart:convert';
 import 'dart:math';
 import 'package:crypto/crypto.dart';
+import 'package:flutter/foundation.dart';
 //import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirebaseAuthService {
@@ -52,7 +53,7 @@ class FirebaseAuthService {
         };
       }
     } catch (e) {
-      print('Google Sign In Error: $e');
+      debugPrint('Google Sign In Error: $e');
       throw e;
     }
     return null;
@@ -63,13 +64,13 @@ class FirebaseAuthService {
 // Apple Sign In
   static Future<Map<String, dynamic>?> signInWithApple() async {
     try {
-      print('🔵 Starting Apple Sign In...');
+      debugPrint('🔵 Starting Apple Sign In...');
       final rawNonce = generateNonce();
       final nonce = sha256ofString(rawNonce); // This should work now
 
-      print('🔵 Requesting Apple ID credential...');
-      print('🔵 Client ID: com.microstatik.alKhaliq.signin');
-      print(
+      debugPrint('🔵 Requesting Apple ID credential...');
+      debugPrint('🔵 Client ID: com.microstatik.alKhaliq.signin');
+      debugPrint(
           '🔵 Redirect URI: https://al-khalid.firebaseapp.com/__/auth/handler');
 
       final appleCredential = await SignInWithApple.getAppleIDCredential(
@@ -85,20 +86,20 @@ class FirebaseAuthService {
         ),
       );
 
-      print('🟢 Apple credential received successfully');
+      debugPrint('🟢 Apple credential received successfully');
 
       final oauthCredential = OAuthProvider("apple.com").credential(
         idToken: appleCredential.identityToken,
         rawNonce: rawNonce,
       );
 
-      print('🔵 Signing in to Firebase...');
+      debugPrint('🔵 Signing in to Firebase...');
       final UserCredential result =
           await _auth.signInWithCredential(oauthCredential);
       final User? user = result.user;
 
       if (user != null) {
-        print('🟢 Firebase sign-in successful');
+        debugPrint('🟢 Firebase sign-in successful');
 
         final String? idToken = await user.getIdToken();
         return {
@@ -112,8 +113,8 @@ class FirebaseAuthService {
         };
       }
     } catch (e, stackTrace) {
-      print('🔴 Apple Sign In Error: $e');
-      print('🔴 Stack trace: $stackTrace');
+      debugPrint('🔴 Apple Sign In Error: $e');
+      debugPrint('🔴 Stack trace: $stackTrace');
       rethrow;
     }
     return null;
