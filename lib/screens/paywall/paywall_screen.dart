@@ -32,8 +32,8 @@ class _CustomPaywallState extends State<CustomPaywall> {
       Platform.isIOS ? 'premium_yearly' : 'premium_yearly:yearly';
 
   // Links
-  final String privacyUrl = 'https://al-khaliq.org/privacy';
-  final String termsUrl = 'https://al-khaliq.org/terms';
+  final String privacyUrl = 'https://al-khaliq.info/privacy';
+  final String termsUrl = 'https://al-khaliq.info/terms';
 
   @override
   void initState() {
