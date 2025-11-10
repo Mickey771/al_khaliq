@@ -1,7 +1,5 @@
-
 import 'dart:ui';
 
-import 'package:al_khaliq/helpers/svg_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -14,7 +12,7 @@ class BackButtonWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: (){
+      onTap: () {
         Get.back();
       },
       child: Padding(
@@ -26,11 +24,15 @@ class BackButtonWidget extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 10.sp, vertical: 10.sp),
               decoration: BoxDecoration(
-                  color: whiteColor.withOpacity(0.1),
+                  color: whiteColor.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(12.sp),
-                  border: Border.all(color: whiteColor.withOpacity(0.10), width: 1.3.sp)
+                  border: Border.all(
+                      color: whiteColor.withValues(alpha: 0.10),
+                      width: 1.3.sp)),
+              child: Icon(
+                Icons.arrow_back_ios_new,
+                color: whiteColor,
               ),
-              child: Icon(Icons.arrow_back_ios_new, color: whiteColor,),
             ),
           ),
         ),

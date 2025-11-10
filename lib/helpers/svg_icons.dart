@@ -4,13 +4,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 class IconSVG extends StatelessWidget {
   const IconSVG({
-    Key? key,
+    super.key,
     required this.assetPath,
     this.color,
     this.height,
     this.width,
     this.fit = BoxFit.contain,
-  }) : super(key: key);
+  });
 
   final String assetPath;
   final Color? color;

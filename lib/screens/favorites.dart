@@ -7,9 +7,7 @@ import 'package:al_khaliq/screens/music_player.dart';
 import 'package:al_khaliq/screens/search.dart';
 import 'package:al_khaliq/screens/side_nav.dart';
 import 'package:audio_service/audio_service.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import '../../helpers/constants.dart';
@@ -18,7 +16,7 @@ import '../helpers/subheading.dart';
 import '../helpers/svg_icons.dart';
 
 class Favorites extends StatefulWidget {
-  const Favorites({Key? key}) : super(key: key);
+  const Favorites({super.key});
 
   @override
   State<Favorites> createState() => _FavoritesState();

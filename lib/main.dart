@@ -8,7 +8,6 @@ import 'helpers/audio_handler.dart';
 import 'onboarding/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-import 'screens/home.dart';
 import 'screens/paywall/paywall_screen.dart';
 import 'controllers/subscription_controller.dart';
 import 'onboarding/login.dart';
@@ -34,7 +33,7 @@ void main() async {
   // ✅ Configure RevenueCat with anonymous user
   await Purchases.configure(
       PurchasesConfiguration(RevenueCatConfig.apiKey)..appUserID = 'anonymous');
-  print('RevenueCat configured in main');
+  debugPrint('RevenueCat configured in main');
 
   audioHandler = await AudioService.init(
     builder: () => MyAudioHandler(),
@@ -55,7 +54,7 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {

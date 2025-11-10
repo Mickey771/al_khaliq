@@ -1,25 +1,17 @@
-
-import 'package:al_khaliq/services/genre_services.dart';
+// import 'package:al_khaliq/services/genre_services.dart';
 import 'package:al_khaliq/services/music_services.dart';
 import 'package:al_khaliq/services/playlist_services.dart';
-import 'package:flutter/material.dart';
+// import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:page_transition/page_transition.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:page_transition/page_transition.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 
-import '../onboarding/auth_board.dart';
+// import '../onboarding/auth_board.dart';
 import '../onboarding/login.dart';
-import '../screens/views.dart';
-import '../services/account_services.dart';
-
-
-
+// import '../screens/views.dart';
+// import '../services/account_services.dart';
 
 class PlaylistController extends GetxController {
-
-
-
-
   RxBool loadingStatus = false.obs;
 
   RxList userPlayLists = [].obs;
@@ -27,16 +19,12 @@ class PlaylistController extends GetxController {
   RxList recentlyPlayed = [].obs;
   RxList favouriteMusics = [].obs;
 
-
-
-
   getUserPlaylists(token, userId) async {
     loadingStatus.value = true;
     PlaylistServices.getUserPlaylists((status, response) {
       if (status) {
         loadingStatus.value = false;
         userPlayLists.value = response;
-
       } else {
         loadingStatus.value = false;
         // showFlashError(context, response);
@@ -45,14 +33,12 @@ class PlaylistController extends GetxController {
     }, token, userId);
   }
 
-
   getPlaylistSongs(token, playlistId) async {
     loadingStatus.value = true;
     PlaylistServices.getUserPlaylistSongs((status, response) {
       if (status) {
         loadingStatus.value = false;
         playlistSongs.value = response['songs'];
-
       } else {
         loadingStatus.value = false;
         // showFlashError(context, response);
@@ -61,15 +47,12 @@ class PlaylistController extends GetxController {
     }, token, playlistId);
   }
 
-
-
   getRecentlyPlayed(token) async {
     loadingStatus.value = true;
     MusicServices.getRecentlyPlayed((status, response) {
       if (status) {
         loadingStatus.value = false;
         recentlyPlayed.value = response['data'];
-
       } else {
         loadingStatus.value = false;
         // showFlashError(context, response);
@@ -78,14 +61,12 @@ class PlaylistController extends GetxController {
     }, token);
   }
 
-
   getFavourites(token) async {
     loadingStatus.value = true;
     MusicServices.getFavourites((status, response) {
       if (status) {
         loadingStatus.value = false;
         favouriteMusics.value = response['data'];
-
       } else {
         loadingStatus.value = false;
         // showFlashError(context, response);
@@ -124,13 +105,10 @@ class PlaylistController extends GetxController {
     }, token, {'id': musicId});
   }
 
-
   signOut(token) async {
     // Get.to(() => Loading());
     // SharedPreferences prefs = await SharedPreferences.getInstance();
     // prefs.clear();
     Get.offAll(() => Login());
   }
-
-
 }

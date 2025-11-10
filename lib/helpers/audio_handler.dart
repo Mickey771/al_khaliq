@@ -1,6 +1,7 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:audio_session/audio_session.dart';
+import 'package:flutter/foundation.dart';
 
 class MyAudioHandler extends BaseAudioHandler with SeekHandler {
   final player = AudioPlayer();
@@ -11,13 +12,13 @@ class MyAudioHandler extends BaseAudioHandler with SeekHandler {
 
   @override
   Future<void> play() async {
-    print(">>> PLAY triggered");
+    debugPrint(">>> PLAY triggered");
     await player.play();
   }
 
   @override
   Future<void> pause() async {
-    print(">>> PAUSE triggered");
+    debugPrint(">>> PAUSE triggered");
     await player.pause();
   }
 
@@ -69,9 +70,7 @@ class MyAudioHandler extends BaseAudioHandler with SeekHandler {
     });
 
     player.sequenceStateStream.listen((state) {
-      if (state?.sequence != null) {
-        // Update media item if needed
-      }
+      // Update media item if needed
     });
   }
 

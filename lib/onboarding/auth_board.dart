@@ -1,4 +1,3 @@
-import 'dart:async';
 
 import 'package:al_khaliq/controllers/genre_controller.dart';
 import 'package:al_khaliq/controllers/music_controller.dart';
@@ -6,22 +5,15 @@ import 'package:al_khaliq/controllers/playlist_controller.dart';
 import 'package:al_khaliq/controllers/user_controller.dart';
 import 'package:al_khaliq/onboarding/login.dart';
 import 'package:al_khaliq/onboarding/sign_up.dart';
-import 'package:al_khaliq/screens/genre/genreSongs.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import '../../helpers/constants.dart';
-import '../../helpers/validator.dart';
 import '../controllers/account_controller.dart';
-import '../helpers/textfield.dart';
 
 class AuthBoard extends StatefulWidget {
-  const AuthBoard({Key? key}) : super(key: key);
+  const AuthBoard({super.key});
 
   @override
   State<AuthBoard> createState() => _AuthBoardState();

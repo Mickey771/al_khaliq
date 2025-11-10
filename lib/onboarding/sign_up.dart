@@ -1,15 +1,9 @@
-import 'dart:async';
 
 import 'package:al_khaliq/onboarding/login.dart';
-import 'package:al_khaliq/screens/home_screen.dart';
-import 'package:al_khaliq/screens/views.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import '../../helpers/constants.dart';
 import '../../helpers/validator.dart';
@@ -17,7 +11,7 @@ import '../controllers/account_controller.dart';
 import '../helpers/textfield.dart';
 
 class SignUp extends StatefulWidget {
-  const SignUp({Key? key}) : super(key: key);
+  const SignUp({super.key});
 
   @override
   State<SignUp> createState() => _SignUpState();

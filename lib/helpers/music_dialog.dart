@@ -10,14 +10,14 @@ import 'package:get/get.dart';
 import 'constants.dart';
 
 class MusicDialog extends StatelessWidget {
-   MusicDialog({this.favorite, this.favoriteList, super.key});
+  MusicDialog({this.favorite, this.favoriteList, super.key});
 
-   Map? favorite;
-   List? favoriteList;
+  final Map? favorite;
+  final List? favoriteList;
 
-   MusicController musicController = Get.find();
-   AccountController accountController = Get.find();
-   UserController userController = Get.find();
+  final MusicController musicController = Get.find();
+  final AccountController accountController = Get.find();
+  final UserController userController = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -40,16 +40,38 @@ class MusicDialog extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 _buildMenuItem('close-circle', 'Remove'),
-                Divider(color: whiteColor.withOpacity(0.1),),
-                Obx(() => _buildMenuItem(musicController.favouriteMusics.where((e) => e['id'] == favorite!['id']).isNotEmpty ? 'heart-filled' : 'heart-outlined', musicController.favouriteMusics.where((e) => e['id'] == favorite!['id']).isNotEmpty ? 'Remove From Favorite' : 'Add To My Favorite',
-                    onTap: (){
-                  //
-                      musicController.favouriteMusics.where((e) => e['id'] == favorite!['id']).isNotEmpty ?  musicController.removeFromFavourites(userController.getToken(), favorite!['id'])
-                          : musicController.addFavourites(userController.getToken(), favorite!['id']);
-                    }),),
-                Divider(color: whiteColor.withOpacity(0.1),),
+                Divider(
+                  color: whiteColor.withOpacity(0.1),
+                ),
+                Obx(
+                  () => _buildMenuItem(
+                      musicController.favouriteMusics
+                              .where((e) => e['id'] == favorite!['id'])
+                              .isNotEmpty
+                          ? 'heart-filled'
+                          : 'heart-outlined',
+                      musicController.favouriteMusics
+                              .where((e) => e['id'] == favorite!['id'])
+                              .isNotEmpty
+                          ? 'Remove From Favorite'
+                          : 'Add To My Favorite', onTap: () {
+                    //
+                    musicController.favouriteMusics
+                            .where((e) => e['id'] == favorite!['id'])
+                            .isNotEmpty
+                        ? musicController.removeFromFavourites(
+                            userController.getToken(), favorite!['id'])
+                        : musicController.addFavourites(
+                            userController.getToken(), favorite!['id']);
+                  }),
+                ),
+                Divider(
+                  color: whiteColor.withOpacity(0.1),
+                ),
                 _buildMenuItem('shuffle', 'Share'),
-                Divider(color: whiteColor.withOpacity(0.1),),
+                Divider(
+                  color: whiteColor.withOpacity(0.1),
+                ),
                 _buildMenuItem('download', 'Download'),
               ],
             ),
@@ -66,11 +88,12 @@ class MusicDialog extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 10.sp, vertical: 8.sp),
         child: Row(
           children: [
-            IconSVG(assetPath: 'assets/images/icons/$icon.svg', color: whiteColor),
+            IconSVG(
+                assetPath: 'assets/images/icons/$icon.svg', color: whiteColor),
             SizedBox(width: 10.sp),
             Text(
               label,
-              style:  TextStyle(
+              style: TextStyle(
                 color: Colors.white,
                 fontSize: 14.sp,
                 fontWeight: FontWeight.w400,

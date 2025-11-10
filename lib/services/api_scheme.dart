@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
@@ -8,11 +9,11 @@ import 'package:http_parser/http_parser.dart';
 
 class ApiServices {
   static makePostRequest({apiUrl, data, token}) async {
-    print('Auth - $token');
+    debugPrint('Auth - $token');
 
     final uri = Uri.parse(apiUrl);
     final jsonString = json.encode(data);
-    var headers;
+    Map<String, String> headers;
     if (token == null) {
       headers = {
         HttpHeaders.contentTypeHeader: 'application/json',
@@ -29,11 +30,11 @@ class ApiServices {
   }
 
   static makeDeleteRequest({apiUrl, data, token}) async {
-    print('Auth - $token');
+    debugPrint('Auth - $token');
 
     final uri = Uri.parse(apiUrl);
     final jsonString = json.encode(data);
-    var headers;
+    Map<String, String> headers;
     if (token == null) {
       headers = {
         HttpHeaders.contentTypeHeader: 'application/json',
@@ -50,11 +51,11 @@ class ApiServices {
   }
 
   static makePatchRequest({apiUrl, data, token}) async {
-    print('Auth - $token');
+    debugPrint('Auth - $token');
 
     final uri = Uri.parse(apiUrl);
     final jsonString = json.encode(data);
-    var headers;
+    Map<String, String> headers;
 
     headers = {
       'accept': 'application/json',
@@ -67,10 +68,10 @@ class ApiServices {
   }
 
   static makeGetRequest({apiUrl, token}) async {
-    print('Auth - $token');
+    debugPrint('Auth - $token');
 
     var uri = Uri.parse(apiUrl);
-    var headers;
+    Map<String, String> headers;
 
     headers = {
       // 'Accept': '*/*',
@@ -85,26 +86,26 @@ class ApiServices {
   static initialisePostRequest(
       {required data, required String url, token}) async {
     try {
-      print(token);
-      print(data);
-      print(url);
+      debugPrint(token);
+      debugPrint(data);
+      debugPrint(url);
 
       http.Response response = await ApiServices.makePostRequest(
           apiUrl: url, data: data, token: token);
       var body = jsonDecode(response.body);
-      print(response.statusCode);
-      print(response.body);
-      print('Res  $url ---- $body');
+      // debugPrint(response.statusCode);
+      debugPrint(response.body);
+      debugPrint('Res  $url ---- $body');
 
       if (ApiServices.isRequestSuccessful(response.statusCode)) {
-        print('Success');
+        debugPrint('Success');
         return body;
       } else {
-        print('INVALID LOGIN');
+        debugPrint('INVALID LOGIN');
         return ApiServices.handleError(response);
       }
     } catch (e) {
-      print('Error - $e');
+      debugPrint('Error - $e');
       if (e.toString().contains('HandshakeException')) {
         return 'Check your internet connection';
       } else {
@@ -123,9 +124,9 @@ class ApiServices {
     };
 
     try {
-      print(token);
-      print(data);
-      print(url);
+      debugPrint(token);
+      debugPrint(data);
+      debugPrint(url);
 
       var uri = Uri.parse(url);
 
@@ -136,33 +137,33 @@ class ApiServices {
       request.headers.addAll(headers);
 
       for (var i in banner) {
-        print(i.path);
+        debugPrint(i.path);
         request.files.add(await http.MultipartFile.fromPath('banner', i.path,
             contentType: MediaType('image', 'jpeg')));
       }
 
       var response = await request.send();
-      print("ressssss $response");
+      debugPrint("ressssss $response");
 
       // response.stream.bytesToString();
 
-      print(response.statusCode);
-      print(response.stream);
-      print(response.request);
+      // Print(response.statusCode);
+      // print(response.stream);
+      // Print(response.request);
 
       if (ApiServices.isRequestSuccessful(response.statusCode)) {
-        print('Success');
+        debugPrint('Success');
         var body;
         response.stream.transform(utf8.decoder).listen((value) {
           body = jsonDecode(value);
         });
         return response;
       } else {
-        print('i am here now ERROR');
+        debugPrint('i am here now ERROR');
         Get.back();
       }
     } catch (e) {
-      print('Error - $e');
+      debugPrint('Error - $e');
 
       if (e.toString().contains('HandshakeException')) {
         return 'Check your internet connection';
@@ -175,26 +176,26 @@ class ApiServices {
   static initialiseDeleteRequest(
       {required data, required String url, token}) async {
     try {
-      print(token);
-      print(data);
-      print(url);
+      debugPrint(token);
+      debugPrint(data);
+      debugPrint(url);
 
       http.Response response = await ApiServices.makeDeleteRequest(
           apiUrl: url, data: data, token: token);
       var body = jsonDecode(response.body);
-      print(response.statusCode);
-      print(response.body);
-      print('Res  $url ---- $body');
+      // debugPrint(response.statusCode);
+      debugPrint(response.body);
+      debugPrint('Res  $url ---- $body');
 
       if (ApiServices.isRequestSuccessful(response.statusCode)) {
-        print('Success');
+        debugPrint('Success');
         return body;
       } else {
-        print('i am here now ERROR');
+        debugPrint('i am here now ERROR');
         return ApiServices.handleError(response);
       }
     } catch (e) {
-      print('Errororor - $e');
+      debugPrint('Errororor - $e');
 
       if (e.toString().contains('HandshakeException')) {
         return 'Check your internet connection';
@@ -208,11 +209,11 @@ class ApiServices {
       {required Map<String, dynamic> data, required String url, token}) async {
     // if (await InternetServices.checkConnectivity()) {
     try {
-      print(url);
+      debugPrint(url);
       var response = await ApiServices.makePatchRequest(
           apiUrl: url, data: data, token: token);
       var body = jsonDecode(response.body);
-      print('Res  $url ---- $body');
+      debugPrint('Res  $url ---- $body');
 
       if (ApiServices.isRequestSuccessful(response.statusCode)) {
         return body;
@@ -220,7 +221,7 @@ class ApiServices {
         return ApiServices.handleError(response);
       }
     } catch (e) {
-      print(e.toString());
+      debugPrint(e.toString());
 
       return e.toString();
     }
@@ -232,27 +233,27 @@ class ApiServices {
   static initialiseGetRequest({required String url, token}) async {
     // if (await InternetServices.checkConnectivity()) {
     try {
-      print('ddf');
+      debugPrint('ddf');
 
-      print(url);
+      debugPrint(url);
       http.Response response =
           await ApiServices.makeGetRequest(apiUrl: url, token: token);
 
-      print(response.headers);
-      print(response.request);
-      print(response.statusCode);
-      print(response.body);
+      // debugPrint(response.headers);
+      // debugPrint(response.request);
+      // debugPrint(response.statusCode);
+      debugPrint(response.body);
       var body = jsonDecode(response.body);
 
-      print('dd3f');
-      print('Res  $url ---- $body');
+      debugPrint('dd3f');
+      debugPrint('Res  $url ---- $body');
       if (ApiServices.isRequestSuccessful(response.statusCode)) {
         return body;
       } else {
         return ApiServices.handleError(response);
       }
     } catch (e) {
-      print('Erroror - - - - - $e');
+      debugPrint('Erroror - - - - - $e');
 
       return e.toString();
     }
@@ -285,10 +286,10 @@ class ApiServices {
       errorMessage = 'Failed to parse error response';
     }
 
-    print(errorMessage);
+    debugPrint(errorMessage);
     switch (response.statusCode) {
       case 400:
-        throw ('$errorMessage');
+        throw (errorMessage);
 
       case 401:
         throw 'Unauthorized request - $errorMessage';

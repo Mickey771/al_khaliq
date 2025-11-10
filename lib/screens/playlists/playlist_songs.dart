@@ -1,27 +1,21 @@
-
 import 'dart:ui';
 
 import 'package:al_khaliq/controllers/playlist_controller.dart';
 import 'package:audio_service/audio_service.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../controllers/user_controller.dart';
-import '../../helpers/audio_player.dart';
 import '../../helpers/constants.dart';
 import '../../helpers/music_widget.dart';
-import '../../helpers/svg_icons.dart';
 import '../music_player.dart';
 
 class PlaylistSongs extends StatefulWidget {
+  final int? playlistId;
+  final String? playlistName;
 
-
-  int? playlistId;
-  String? playlistName;
-
-  PlaylistSongs({super.key, this.playlistId, this.playlistName});
+  const PlaylistSongs({super.key, this.playlistId, this.playlistName});
 
   @override
   State<PlaylistSongs> createState() => _PlaylistSongsState();
@@ -39,14 +33,15 @@ class _PlaylistSongsState extends State<PlaylistSongs> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    playlistController.getPlaylistSongs(userController.getToken(), widget.playlistId!);
+    playlistController.getPlaylistSongs(
+        userController.getToken(), widget.playlistId!);
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color:  Color(0xFF10121f),
+        color: Color(0xFF10121f),
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -59,20 +54,17 @@ class _PlaylistSongsState extends State<PlaylistSongs> {
                 child: Container(
                   height: 300,
                   width: 300,
-                  decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          offset: Offset(0, 4),
-                          blurRadius: 150,
-                          spreadRadius: 0,
-                          color: Color(0xFF220b56),
-                          // color: Colors.red
-                        )
-                      ]
-                  ),
-                )
-            ),
+                  decoration:
+                      const BoxDecoration(shape: BoxShape.circle, boxShadow: [
+                    BoxShadow(
+                      offset: Offset(0, 4),
+                      blurRadius: 150,
+                      spreadRadius: 0,
+                      color: Color(0xFF220b56),
+                      // color: Colors.red
+                    )
+                  ]),
+                )),
 
             Positioned(
                 top: 300,
@@ -80,19 +72,16 @@ class _PlaylistSongsState extends State<PlaylistSongs> {
                 child: Container(
                   height: 300,
                   width: 300,
-                  decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          offset: Offset(0, 4),
-                          blurRadius: 170,
-                          spreadRadius: 0,
-                          color: Color(0xFF584171),
-                        )
-                      ]
-                  ),
-                )
-            ),
+                  decoration:
+                      const BoxDecoration(shape: BoxShape.circle, boxShadow: [
+                    BoxShadow(
+                      offset: Offset(0, 4),
+                      blurRadius: 170,
+                      spreadRadius: 0,
+                      color: Color(0xFF584171),
+                    )
+                  ]),
+                )),
 
             Positioned(
                 bottom: -50,
@@ -100,19 +89,16 @@ class _PlaylistSongsState extends State<PlaylistSongs> {
                 child: Container(
                   height: 300,
                   width: 300,
-                  decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          offset: Offset(0, 4),
-                          blurRadius: 180,
-                          spreadRadius: 0,
-                          color: Color(0xFF47687d),
-                        )
-                      ]
-                  ),
-                )
-            ),
+                  decoration:
+                      const BoxDecoration(shape: BoxShape.circle, boxShadow: [
+                    BoxShadow(
+                      offset: Offset(0, 4),
+                      blurRadius: 180,
+                      spreadRadius: 0,
+                      color: Color(0xFF47687d),
+                    )
+                  ]),
+                )),
 
             SingleChildScrollView(
               child: Padding(
@@ -120,60 +106,63 @@ class _PlaylistSongsState extends State<PlaylistSongs> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-
-
-                    Text(widget.playlistName!,
+                    Text(
+                      widget.playlistName!,
                       style: TextStyle(
                           fontSize: 18.sp,
                           fontWeight: FontWeight.w600,
-                          color: whiteColor
-                      ),),
-
+                          color: whiteColor),
+                    ),
                     verticalSpace(0.02),
+                    Obx(
+                      () => playlistController.playlistSongs.isEmpty
+                          ? musicWidgetLoader()
+                          : ListView.separated(
+                              padding: EdgeInsets.symmetric(horizontal: 10),
+                              physics: NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemCount:
+                                  playlistController.playlistSongs.length,
+                              itemBuilder: (context, index) => InkWell(
+                                onTap: () {
+                                  List<MediaItem> mediaItems =
+                                      playlistController.playlistSongs
+                                          .map<MediaItem>((music) {
+                                    return MediaItem(
+                                      id: music['file'],
+                                      title: music['title'] ?? "",
+                                      artist:
+                                          music['artist'] ?? 'Unknown Artist',
+                                      displayTitle: music['title'] ?? "",
+                                      album: music['album'] ?? 'Unknown Album',
+                                      artUri: Uri.parse(music['image'] ?? ""),
+                                    );
+                                  }).toList();
 
-
-                    Obx(() => playlistController.playlistSongs.isEmpty ? musicWidgetLoader()
-                        : ListView.separated(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      physics: NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: playlistController.playlistSongs.length,
-                      itemBuilder: (context, index) => InkWell(
-                        onTap: (){
-
-                          List<MediaItem> mediaItems = playlistController.playlistSongs.map<MediaItem>((music) {
-                            return MediaItem(
-                              id: music['file'],
-                              title: music['title'] ?? "",
-                              artist: music['artist'] ?? 'Unknown Artist',
-                              displayTitle: music['title'] ?? "",
-                              album: music['album'] ?? 'Unknown Album',
-                              artUri: Uri.parse(music['image'] ?? ""),
-                            );
-                          }).toList();
-
-                          Get.to(() => MusicPlayer(
-                            index: index,
-                            songList: mediaItems,
-                            songs: playlistController.playlistSongs,
-                          ));
-
-                        },
-                        child: MusicWidget(
-                          favorite: playlistController.playlistSongs[index],
-                          favoriteList: playlistController.playlistSongs,
-                        ),
-                      ),
-                      separatorBuilder: (_,__) => Divider(height: 50, thickness: 0.1, color: Colors.white,),
-                    ),)
-
-
-
+                                  Get.to(() => MusicPlayer(
+                                        index: index,
+                                        songList: mediaItems,
+                                        songs: playlistController.playlistSongs,
+                                      ));
+                                },
+                                child: MusicWidget(
+                                  favorite:
+                                      playlistController.playlistSongs[index],
+                                  favoriteList:
+                                      playlistController.playlistSongs,
+                                ),
+                              ),
+                              separatorBuilder: (_, __) => Divider(
+                                height: 50,
+                                thickness: 0.1,
+                                color: Colors.white,
+                              ),
+                            ),
+                    )
                   ],
                 ),
               ),
             ),
-
 
             Align(
               alignment: Alignment.topLeft,
@@ -183,7 +172,7 @@ class _PlaylistSongsState extends State<PlaylistSongs> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     InkWell(
-                      onTap: (){
+                      onTap: () {
                         Get.back();
                       },
                       child: ClipRRect(
@@ -194,21 +183,23 @@ class _PlaylistSongsState extends State<PlaylistSongs> {
                             height: height() * 0.055,
                             padding: EdgeInsets.symmetric(horizontal: 10.sp),
                             decoration: BoxDecoration(
-                                color: whiteColor.withOpacity(0.1),
+                                color: whiteColor.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(12.sp),
-                                border: Border.all(color: whiteColor.withOpacity(0.09), width: 1.sp)
+                                border: Border.all(
+                                    color: whiteColor.withValues(alpha: 0.9),
+                                    width: 1.sp)),
+                            child: Icon(
+                              Icons.arrow_back_ios_new,
+                              color: whiteColor,
                             ),
-                            child: Icon(Icons.arrow_back_ios_new, color: whiteColor,),
                           ),
                         ),
                       ),
                     ),
-
                   ],
                 ),
               ),
             ),
-
 
             // Align(
             //   alignment: Alignment.bottomCenter,
@@ -280,11 +271,9 @@ class _PlaylistSongsState extends State<PlaylistSongs> {
             //     ),
             //   ),)
             // ),
-
           ],
         ),
       ),
     );
   }
 }
-

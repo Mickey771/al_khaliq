@@ -1,19 +1,15 @@
-import 'package:al_khaliq/controllers/account_controller.dart';
 import 'package:al_khaliq/controllers/user_controller.dart';
 import 'package:al_khaliq/helpers/constants.dart';
 import 'package:al_khaliq/helpers/logout_dialog.dart';
-import 'package:al_khaliq/onboarding/auth_board.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:shimmer/shimmer.dart';
 import 'package:al_khaliq/screens/web_view.dart';
 
 class SideNav extends StatelessWidget {
   SideNav({super.key});
 
-  List navOptions = [
+  final List navOptions = [
     "Privacy Policy",
     "Terms & Conditions",
     "Rate App",
@@ -23,7 +19,7 @@ class SideNav extends StatelessWidget {
     "Delete My Data"
   ];
 
-  UserController userController = Get.find();
+  final UserController userController = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -106,14 +102,12 @@ class SideNav extends StatelessWidget {
                           case 0:
                             Get.to(() => WebViewPage(
                                 title: "Privacy Policy",
-                                url:
-                                    "https://app.termly.io/policy-viewer/policy.html?policyUUID=7ddc89fa-948c-4c8c-a13d-64e0e51c5012"));
+                                url: "https://www.al-khaliq.info/privacy"));
                             break;
                           case 1:
                             Get.to(() => WebViewPage(
                                 title: "Terms & Conditions",
-                                url:
-                                    "https://url4140.termly.io/ls/click?upn=u001.DLyPg4GD5BzyE5FEzu8sZpbqVBN-2FAi97yuA5mWyg-2FwEcNdTnx2s2ZUYCLRCONL-2FVOhSo3JdfR5kDEOox10luHr6Q9zuTMpZ8fLVRO-2BAl9fDnfTNAwUcSY6kK2f1vf1DE5bBNbf5Y67KAyfIVU5hBQA-3D-3DNv7a_vTb4ulaCoZxef0WTOAW9Z-2FV2IK3Jn9u4ubvW0pTOReuzn-2FsnWa5JkfwMgIq6KyoxzN-2FSs74DchXxM72-2B4NsAhul1dPKQ6Ych2YK-2FDiRg5IslRqinqfF8XttT4Yf1nyKVEFCaeS1bjetD8wYcDH-2FL3bEpRYWw87AtS4JlAACBqutbyCeSWb2oIPCMMyoN08LSi-2F7tqJhT-2FboTvrfrnvDcl-2BkHXYRBYo44jCu7PBZEN8RODmWk-2F7zH5wjdy1HqDLqD-2FgoheQJ-2FdZf1gVo76av8Qs0zBZwBySJyhfJPrBf7T9Uzp-2BbLuDtu7VM-2F2cacTvEgcnQWTmiYX-2FJQn4fXGBwHmX-2FlT0nLBmpnuiiBNaLdhVTaW-2FDSKv5jJZbMs3j-2B7sF-2ByayCeOtfgRPmrI-2B7Lb7N-2F1ou1RIEV6eVz3ZTnWbhPxniVmKysj1zC5ImRlGddMID"));
+                                url: "https://www.al-khaliq.info/terms"));
                             break;
                           case 2:
                             // Implement rate app functionality

@@ -283,12 +283,11 @@ class AccountController extends GetxController {
 
       /// >>> end addition <<<
 
+      await userController.getUser(token, uid);
+
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('token', token);
       await prefs.setString('uid', uid);
-
-      await userController.getUser(token, uid);
-
       genreController.getGenres(token);
       musicController.getAllSongs(token);
       musicController.getNewReleases(token);

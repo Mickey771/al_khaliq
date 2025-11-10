@@ -54,7 +54,7 @@ class FirebaseAuthService {
       }
     } catch (e) {
       debugPrint('Google Sign In Error: $e');
-      throw e;
+      rethrow;
     }
     return null;
   }

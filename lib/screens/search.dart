@@ -5,9 +5,7 @@ import 'package:al_khaliq/controllers/genre_controller.dart';
 import 'package:al_khaliq/controllers/music_controller.dart';
 import 'package:al_khaliq/screens/music_player.dart';
 import 'package:audio_service/audio_service.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
@@ -16,16 +14,13 @@ import '../controllers/account_controller.dart';
 import '../helpers/music_widget.dart';
 
 class Search extends StatefulWidget {
-  const Search({Key? key}) : super(key: key);
+  const Search({super.key});
 
   @override
   State<Search> createState() => _SearchState();
 }
 
 class _SearchState extends State<Search> {
-
-
-
   AccountController accountController = Get.find();
   GenreController genreController = Get.find();
   MusicController musicController = Get.find();
@@ -33,7 +28,6 @@ class _SearchState extends State<Search> {
   RxBool visible = false.obs;
 
   RxList songs = [].obs;
-
 
   final TextEditingController _searchController = TextEditingController();
   Timer? _debounce;
@@ -46,25 +40,21 @@ class _SearchState extends State<Search> {
     songs = musicController.allSongs;
   }
 
-
   void onSearchChanged() {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 300), () {
       final query = _searchController.text.toLowerCase();
-      if(_searchController.text.isNotEmpty){
-          musicController.filteredSongs.value = songs
-              .where((music) => music['title'].toLowerCase().contains(query))
-              .toList();
-      }
-      else{
-          musicController.filteredSongs.clear();
-          songs = musicController.allSongs;
-          musicController.filteredSongs.value = songs;
+      if (_searchController.text.isNotEmpty) {
+        musicController.filteredSongs.value = songs
+            .where((music) => music['title'].toLowerCase().contains(query))
+            .toList();
+      } else {
+        musicController.filteredSongs.clear();
+        songs = musicController.allSongs;
+        musicController.filteredSongs.value = songs;
       }
     });
   }
-
-
 
   final GlobalKey<ScaffoldState> _key = GlobalKey();
 
@@ -89,7 +79,6 @@ class _SearchState extends State<Search> {
           clipBehavior: Clip.none,
           alignment: Alignment.topCenter,
           children: [
-
             Positioned(
                 top: 70,
                 left: -50,
@@ -97,7 +86,7 @@ class _SearchState extends State<Search> {
                   height: 300,
                   width: 300,
                   decoration:
-                  const BoxDecoration(shape: BoxShape.circle, boxShadow: [
+                      const BoxDecoration(shape: BoxShape.circle, boxShadow: [
                     BoxShadow(
                       offset: Offset(0, 4),
                       blurRadius: 150,
@@ -114,7 +103,7 @@ class _SearchState extends State<Search> {
                   height: 300,
                   width: 300,
                   decoration:
-                  const BoxDecoration(shape: BoxShape.circle, boxShadow: [
+                      const BoxDecoration(shape: BoxShape.circle, boxShadow: [
                     BoxShadow(
                       offset: Offset(0, 4),
                       blurRadius: 170,
@@ -130,7 +119,7 @@ class _SearchState extends State<Search> {
                   height: 300,
                   width: 300,
                   decoration:
-                  const BoxDecoration(shape: BoxShape.circle, boxShadow: [
+                      const BoxDecoration(shape: BoxShape.circle, boxShadow: [
                     BoxShadow(
                       offset: Offset(0, 4),
                       blurRadius: 180,
@@ -139,56 +128,58 @@ class _SearchState extends State<Search> {
                     )
                   ]),
                 )),
-
             Padding(
               padding: EdgeInsets.fromLTRB(10.sp, 110.sp, 10.sp, 0.sp),
               child: SingleChildScrollView(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                
-                
-                    Obx(() => musicController.allSongsLoadingStatus.value == false ? ListView.separated(
-                        padding: EdgeInsets.only(top: 20.sp, bottom: 22.sp),
-                        physics: NeverScrollableScrollPhysics(),
-                        separatorBuilder: (_,__) => Divider(height: 50, thickness: 0.1, color: Colors.grey,),
-                        shrinkWrap: true,
-                        itemCount: musicController.filteredSongs.length,
-                        itemBuilder: (context, index) => InkWell(
-                          onTap: (){
-                            List<MediaItem> mediaItems = musicController.filteredSongs.map<MediaItem>((music) {
-                              return MediaItem(
-                                id: music['file'],
-                                title: music['title'] ?? "",
-                                artist: music['artist'] ?? 'Unknown Artist',
-                                displayTitle: music['title'] ?? "",
-                                album: music['album'] ?? 'Unknown Album',
-                                artUri: Uri.parse(music['image'] ?? ""),
-                              );
-                            }).toList();
+                    Obx(() => musicController.allSongsLoadingStatus.value ==
+                            false
+                        ? ListView.separated(
+                            padding: EdgeInsets.only(top: 20.sp, bottom: 22.sp),
+                            physics: NeverScrollableScrollPhysics(),
+                            separatorBuilder: (_, __) => Divider(
+                                  height: 50,
+                                  thickness: 0.1,
+                                  color: Colors.grey,
+                                ),
+                            shrinkWrap: true,
+                            itemCount: musicController.filteredSongs.length,
+                            itemBuilder: (context, index) => InkWell(
+                                  onTap: () {
+                                    List<MediaItem> mediaItems = musicController
+                                        .filteredSongs
+                                        .map<MediaItem>((music) {
+                                      return MediaItem(
+                                        id: music['file'],
+                                        title: music['title'] ?? "",
+                                        artist:
+                                            music['artist'] ?? 'Unknown Artist',
+                                        displayTitle: music['title'] ?? "",
+                                        album:
+                                            music['album'] ?? 'Unknown Album',
+                                        artUri: Uri.parse(music['image'] ?? ""),
+                                      );
+                                    }).toList();
 
-
-                            Get.to(() => MusicPlayer(
-                              index: index,
-                              songList: mediaItems,
-                              songs: musicController.filteredSongs,
-                            ));
-                          },
-                
-                          child: MusicWidget(
-                            favoriteList: musicController.filteredSongs,
-                            favorite: musicController.filteredSongs[index],
-                          ),
-                        )
-                    ) : musicWidgetLoader()),
-                
-                
+                                    Get.to(() => MusicPlayer(
+                                          index: index,
+                                          songList: mediaItems,
+                                          songs: musicController.filteredSongs,
+                                        ));
+                                  },
+                                  child: MusicWidget(
+                                    favoriteList: musicController.filteredSongs,
+                                    favorite:
+                                        musicController.filteredSongs[index],
+                                  ),
+                                ))
+                        : musicWidgetLoader()),
                   ],
                 ),
               ),
             ),
-
-
             Align(
               alignment: Alignment.topCenter,
               child: Padding(
@@ -199,14 +190,16 @@ class _SearchState extends State<Search> {
                     Expanded(
                       flex: 2,
                       child: InkWell(
-                        onTap: (){
-                        Get.back();
-                        },
-                        child: Icon(Icons.arrow_back_ios_new, color: whiteColor, size: 30.sp,)
-                      ),
+                          onTap: () {
+                            Get.back();
+                          },
+                          child: Icon(
+                            Icons.arrow_back_ios_new,
+                            color: whiteColor,
+                            size: 30.sp,
+                          )),
                     ),
                     horizontalSpace(0.015),
-
                     Expanded(
                       flex: 12,
                       child: ClipRRect(
@@ -215,38 +208,39 @@ class _SearchState extends State<Search> {
                           filter: ImageFilter.blur(sigmaX: 39, sigmaY: 39),
                           child: Container(
 
-                            // height: height() * 0.05,
-                            // width: width() * 0.75,
-                            // padding: EdgeInsets.symmetric(horizontal: 10.sp),
-                            decoration: BoxDecoration(
-                                color: whiteColor.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(12.sp),
-                                border: Border.all(color: whiteColor.withOpacity(0.09), width: 1.sp)
-                            ),
-                            child: TextField(
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14.sp
-                              ),
-                              onChanged: (v){
-                                onSearchChanged();
-                              },
-                              controller: _searchController,
-                              decoration: InputDecoration(
-                                prefixIcon:  Icon(Icons.search, color: whiteColor,),
-                                hintText: 'Search Here',
-                                border: InputBorder.none,
-                                contentPadding: EdgeInsets.only(top: 10.sp),
-                                hintStyle: TextStyle(
-                                    fontSize: 14.sp,
+                              // height: height() * 0.05,
+                              // width: width() * 0.75,
+                              // padding: EdgeInsets.symmetric(horizontal: 10.sp),
+                              decoration: BoxDecoration(
+                                  color: whiteColor.withValues(alpha: 0.2),
+                                  borderRadius: BorderRadius.circular(12.sp),
+                                  border: Border.all(
+                                      color: whiteColor.withValues(alpha: 0.9),
+                                      width: 1.sp)),
+                              child: TextField(
+                                style: TextStyle(
+                                    color: Colors.white,
                                     fontWeight: FontWeight.w400,
-                                    color: whiteColor
+                                    fontSize: 14.sp),
+                                onChanged: (v) {
+                                  onSearchChanged();
+                                },
+                                controller: _searchController,
+                                decoration: InputDecoration(
+                                  prefixIcon: Icon(
+                                    Icons.search,
+                                    color: whiteColor,
+                                  ),
+                                  hintText: 'Search Here',
+                                  border: InputBorder.none,
+                                  contentPadding: EdgeInsets.only(top: 10.sp),
+                                  hintStyle: TextStyle(
+                                      fontSize: 14.sp,
+                                      fontWeight: FontWeight.w400,
+                                      color: whiteColor),
+                                  fillColor: Colors.transparent,
                                 ),
-                                fillColor: Colors.transparent,
-                              ),
-                            )
-                          ),
+                              )),
                         ),
                       ),
                     ),
@@ -254,8 +248,6 @@ class _SearchState extends State<Search> {
                 ),
               ),
             ),
-
-
           ],
         ),
       ),
@@ -263,8 +255,7 @@ class _SearchState extends State<Search> {
   }
 }
 
-
-genreWidgetLoader(){
+genreWidgetLoader() {
   return SizedBox(
     height: height() * 0.21,
     child: ListView.builder(
@@ -273,34 +264,35 @@ genreWidgetLoader(){
         itemCount: 3,
         scrollDirection: Axis.horizontal,
         itemBuilder: (context, index) => Padding(
-          padding: EdgeInsets.only(left: 10.sp),
-          child: Shimmer.fromColors(
-            baseColor: Colors.grey.withOpacity(0.2),
-            highlightColor: Colors.white,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                verticalSpace(0.005),
-                Container(
-                  height: height() * 0.17,
-                  width:  height() * 0.17,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8.sp),
-                  ),
+              padding: EdgeInsets.only(left: 10.sp),
+              child: Shimmer.fromColors(
+                baseColor: Colors.grey.withValues(alpha: 0.2),
+                highlightColor: Colors.white,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    verticalSpace(0.005),
+                    Container(
+                      height: height() * 0.17,
+                      width: height() * 0.17,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8.sp),
+                      ),
+                    ),
+                    verticalSpace(0.01),
+                    Container(
+                      height: height() * 0.012,
+                      width: height() * 0.08,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8.sp),
+                      ),
+                    ),
+                  ],
                 ),
-                verticalSpace(0.01),
-                Container(
-                  height: height() * 0.012,
-                  width: height() * 0.08,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8.sp),
-                  ),
-                ),
-              ],
-            ),),
-        )),
+              ),
+            )),
   );
 }

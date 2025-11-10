@@ -1,4 +1,5 @@
 import 'constants.dart';
+import 'package:flutter/foundation.dart';
 
 class EmailValidator {
   static String? validate(String value) {
@@ -16,7 +17,7 @@ class EmailValidator {
 
 class PhoneNumberValidator {
   static String? validate(String value) {
-    print(value);
+    debugPrint(value);
     if (value.isEmpty) {
       return emptyTextField;
     }
@@ -29,7 +30,7 @@ class PhoneNumberValidator {
 
 class PhoneNumberValidator2 {
   static String? validate(String value) {
-    print(value);
+    debugPrint(value);
     if (value.isEmpty) {
       return emptyTextField;
     }
@@ -104,10 +105,10 @@ class FieldValidator {
 class QuantityValidator {
   static String? validate(String label, String value) {
     if (value.isEmpty) {
-      return label +" "+emptyTextField;
+      return "$label $emptyTextField";
     }
-    if(double.parse(value) > 100 || double.parse(value) < 0) {
-      return label +" "+ "must be between 0 and 100";
+    if (double.parse(value) > 100 || double.parse(value) < 0) {
+      return "$label must be between 0 and 100";
     }
 
     return null;
@@ -117,14 +118,9 @@ class QuantityValidator {
 class CheckBoxValidator {
   static String? validate(String label, String value) {
     if (value.isEmpty) {
-      return label +" "+emptyTextField;
+      return "$label $emptyTextField";
     }
 
     return null;
   }
 }
-
-
-
-
-

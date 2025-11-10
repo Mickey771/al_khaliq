@@ -1,14 +1,12 @@
 import 'dart:async';
-import 'package:al_khaliq/services/revenue_cat_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../controllers/account_controller.dart';
-import '../controllers/subscription_controller.dart';
 import 'auth_board.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({Key? key}) : super(key: key);
+  const SplashScreen({super.key});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -26,29 +24,26 @@ class _SplashScreenState extends State<SplashScreen> {
     var token = prefs.getString('token');
     var uid = prefs.getString('uid');
 
-    Timer(const Duration(milliseconds: 2000), () async {
-      // STEP 1: Check if logged in
-      if (token == null || token.isEmpty) {
-        // Not logged in → Go to login
+    // Wait 1.5 seconds for splash screen visibility
+    await Future.delayed(const Duration(milliseconds: 1500));
+
+    debugPrint("🔍 Splash - token: ${token != null ? 'exists' : 'null'}");
+    debugPrint("🔍 Splash - uid: ${uid != null ? 'exists' : 'null'}");
+
+    // Check if logged in
+    if (token == null || token.isEmpty || uid == null || uid.isEmpty) {
+      debugPrint("🔍 No credentials found, going to login");
+      if (mounted) {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const AuthBoard()),
         );
-      } else {
-        // STEP 2: Logged in → Set user
-        AccountController accountController = Get.find<AccountController>();
-        await accountController.setUser(context, token, uid: uid);
-
-        // STEP 3: Update RevenueCat with user ID
-        if (uid != null && uid.isNotEmpty) {
-          await RevenueCatService().updateUserId(uid);
-          debugPrint('RevenueCat user set to: $uid');
-        }
-
-        // STEP 4: Check subscription
-        Get.find<SubscriptionController>().checkSubscription();
       }
-    });
+    } else {
+      debugPrint("🔍 Credentials found, calling setUser");
+      AccountController accountController = Get.find<AccountController>();
+      await accountController.setUser(context, token, uid: uid);
+    }
   }
 
   @override

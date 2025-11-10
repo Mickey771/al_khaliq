@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:ui';
 
 import 'package:al_khaliq/controllers/genre_controller.dart';
@@ -9,9 +8,7 @@ import 'package:al_khaliq/screens/search.dart';
 import 'package:al_khaliq/screens/side_nav.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
@@ -20,9 +17,10 @@ import '../controllers/account_controller.dart';
 import '../helpers/music_widget.dart';
 import '../helpers/subheading.dart';
 import '../helpers/svg_icons.dart';
+import 'package:flutter/foundation.dart';
 
 class Home extends StatefulWidget {
-  const Home({Key? key}) : super(key: key);
+  const Home({super.key});
 
   @override
   State<Home> createState() => _HomeState();
@@ -183,7 +181,8 @@ class _HomeState extends State<Home> {
                                   : musicController.newReleases.length,
                               itemBuilder: (context, index) => InkWell(
                                     onTap: () {
-                                      print(musicController.newReleases[1]);
+                                      debugPrint(
+                                          musicController.newReleases[1]);
                                       List<MediaItem> mediaItems =
                                           musicController.newReleases
                                               .map<MediaItem>((music) {

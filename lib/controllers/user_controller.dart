@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../services/account_services.dart';
-import 'package:page_transition/page_transition.dart';
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -30,10 +27,6 @@ class UserController extends GetxController {
 
   setRefresh(refreshToken) => _refreshToken = refreshToken;
 
-  @override
-  void onInit() {
-    super.onInit();
-  }
 
   setPersistToken(token, refreshToken) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -43,16 +36,28 @@ class UserController extends GetxController {
 
   Future<void> getUser(token, userId) async {
     loadingStatus.value = true;
+
+    // Add a small delay to ensure the callback completes
+    // await Future.delayed(Duration(milliseconds: 100));
+
     UserServices.getUser((status, response) {
       loadingStatus.value = false;
+      debugPrint("🔍 UserServices.getUser callback - status: $status");
+      debugPrint("🔍 UserServices.getUser callback - response: $response");
+
       if (status) {
         user.value = response;
-        debugPrint("User data loaded: $response");
+        debugPrint("✅ User set: ${user.value}");
       } else {
-        debugPrint("Failed to load user data: $response");
-        // Handle error case - you might want to show a snackbar or handle this gracefully
+        debugPrint("❌ Failed to get user: $response");
+        user.value = {}; // Clear user on failure
       }
     }, token, userId);
+
+    // Wait a bit for the callback to execute
+    await Future.delayed(Duration(milliseconds: 500));
+
+    debugPrint("🔍 After getUser - user.value: ${user.value}");
   }
 
   fetchUser(token) {}

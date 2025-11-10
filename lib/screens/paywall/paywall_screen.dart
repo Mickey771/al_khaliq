@@ -8,7 +8,7 @@ import 'package:al_khaliq/screens/web_view.dart';
 import 'dart:io';
 
 class CustomPaywall extends StatefulWidget {
-  const CustomPaywall({Key? key}) : super(key: key);
+  const CustomPaywall({super.key});
 
   @override
   State<CustomPaywall> createState() => _CustomPaywallState();

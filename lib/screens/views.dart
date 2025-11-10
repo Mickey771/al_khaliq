@@ -1,26 +1,20 @@
 import 'dart:ui';
 
 import 'package:al_khaliq/screens/favorites.dart';
-import 'package:al_khaliq/screens/music_player.dart';
 import 'package:al_khaliq/screens/playlists/playlists.dart';
-import 'package:al_khaliq/screens/side_nav.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../helpers/constants.dart';
 import '../helpers/svg_icons.dart';
 import 'home.dart';
 import 'notifications.dart';
-import 'home_screen.dart';
 
 TabController? tabNavigationController;
 int selectedNavigationIndex = 0;
 
 class Views extends StatefulWidget {
-  Views({Key? key}) : super(key: key);
+  const Views({super.key});
 
   @override
   State<Views> createState() => _HomeState();
@@ -150,6 +144,7 @@ class _HomeState extends State<Views> with TickerProviderStateMixin {
     );
   }
 
+  // ignore: non_constant_identifier_names
   Widget BottomNav() {
     return Container(
       margin: EdgeInsets.fromLTRB(16.sp, 0, 16.sp, 16.sp),
@@ -161,10 +156,10 @@ class _HomeState extends State<Views> with TickerProviderStateMixin {
                 height: height() * 0.075,
                 width: width(),
                 decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.4),
+                    color: Colors.black.withValues(alpha: 0.4),
                     borderRadius: BorderRadius.circular(16.sp),
                     border: Border.all(
-                        color: whiteColor.withOpacity(0.09), width: 1.sp)),
+                        color: whiteColor.withValues(alpha: 0.9), width: 1.sp)),
                 child: Padding(
                   padding: EdgeInsets.fromLTRB(15.sp, 10.sp, 15.sp, 0),
                   child: Row(
