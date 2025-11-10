@@ -6,6 +6,7 @@ import '../../controllers/subscription_controller.dart';
 import '../../services/revenue_cat_service.dart';
 import 'package:al_khaliq/screens/web_view.dart';
 import 'dart:io';
+import 'package:al_khaliq/helpers/logout_dialog.dart';
 
 class CustomPaywall extends StatefulWidget {
   const CustomPaywall({super.key});
@@ -285,7 +286,7 @@ class _CustomPaywallState extends State<CustomPaywall> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
-                    onPressed: () => Get.back(),
+                    onPressed: () => LogoutDialog(),
                     icon: Icon(Icons.close, color: Colors.white),
                   ),
                   Text(

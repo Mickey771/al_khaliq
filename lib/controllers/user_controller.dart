@@ -27,7 +27,6 @@ class UserController extends GetxController {
 
   setRefresh(refreshToken) => _refreshToken = refreshToken;
 
-
   setPersistToken(token, refreshToken) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('token', token);
@@ -55,7 +54,7 @@ class UserController extends GetxController {
     }, token, userId);
 
     // Wait a bit for the callback to execute
-    await Future.delayed(Duration(milliseconds: 500));
+    // await Future.delayed(Duration(milliseconds: 500));
 
     debugPrint("🔍 After getUser - user.value: ${user.value}");
   }

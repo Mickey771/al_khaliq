@@ -25,7 +25,7 @@ class _SplashScreenState extends State<SplashScreen> {
     var uid = prefs.getString('uid');
 
     // Wait 1.5 seconds for splash screen visibility
-    await Future.delayed(const Duration(milliseconds: 1500));
+    await Future.delayed(const Duration(milliseconds: 500));
 
     debugPrint("🔍 Splash - token: ${token != null ? 'exists' : 'null'}");
     debugPrint("🔍 Splash - uid: ${uid != null ? 'exists' : 'null'}");

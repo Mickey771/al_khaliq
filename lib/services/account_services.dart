@@ -172,7 +172,7 @@ class AccountServices {
     try {
       debugPrint('📤 Upload File - URL: $url, Title: $title');
 
-      Map<String, String> headers = {
+      var headers = {
         "Accept": "application/json",
       };
 
