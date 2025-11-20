@@ -100,15 +100,26 @@ class FirebaseAuthService {
 
       if (user != null) {
         debugPrint('🟢 Firebase sign-in successful');
+        debugPrint('  - User UID: ${user.uid}');
+        debugPrint('  - User Email: ${user.email}');
+        debugPrint('  - Apple Email: ${appleCredential.email}');
+        debugPrint('  - Apple Given Name: ${appleCredential.givenName}');
 
         final String? idToken = await user.getIdToken();
+        
+        final email = user.email ?? appleCredential.email;
+        final name = user.displayName ??
+              '${appleCredential.givenName ?? ''} ${appleCredential.familyName ?? ''}'
+                  .trim();
+                  
+        debugPrint('  - Final Email to use: $email');
+        debugPrint('  - Final Name to use: $name');
+
         return {
           'user': user,
           'idToken': idToken,
-          'email': user.email ?? appleCredential.email,
-          'name': user.displayName ??
-              '${appleCredential.givenName ?? ''} ${appleCredential.familyName ?? ''}'
-                  .trim(),
+          'email': email,
+          'name': name,
           'uid': user.uid,
         };
       }

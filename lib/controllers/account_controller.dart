@@ -104,7 +104,15 @@ class AccountController extends GetxController {
       loadingStatus.value = true;
 
       final result = await FirebaseAuthService.signInWithApple();
+      debugPrint('🍎 AccountController: Result from Apple Sign In: $result');
+      
       if (result != null) {
+        if (result['email'] == null) {
+          loadingStatus.value = false;
+          _handleError('Could not retrieve email. Please go to iOS Settings -> Apple ID -> Password & Security -> Apps Using Apple ID -> [App Name] -> Stop Using Apple ID, then try again.');
+          return;
+        }
+
         AccountServices.loginUser((status, response) async {
           if (status) {
             if (response != null &&
