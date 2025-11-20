@@ -71,7 +71,7 @@ class FirebaseAuthService {
       debugPrint('🔵 Requesting Apple ID credential...');
       debugPrint('🔵 Client ID: com.microstatik.alKhaliq.signin');
       debugPrint(
-          '🔵 Redirect URI: https://al-khalid.firebaseapp.com/__/auth/handler');
+          '🔵 Redirect URI: https://al-khaliq.firebaseapp.com/__/auth/handler');
 
       final appleCredential = await SignInWithApple.getAppleIDCredential(
         scopes: [
@@ -82,7 +82,7 @@ class FirebaseAuthService {
         webAuthenticationOptions: WebAuthenticationOptions(
           clientId: 'com.microstatik.alKhaliq.signin',
           redirectUri:
-              Uri.parse('https://al-khalid.firebaseapp.com/__/auth/handler'),
+              Uri.parse('https://al-khaliq.firebaseapp.com/__/auth/handler'),
         ),
       );
 

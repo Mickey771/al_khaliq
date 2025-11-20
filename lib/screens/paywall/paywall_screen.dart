@@ -152,7 +152,7 @@ class _CustomPaywallState extends State<CustomPaywall> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Upgrade to Pro',
+          'Subscribe to Continue',
           style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.bold,
@@ -285,12 +285,12 @@ class _CustomPaywallState extends State<CustomPaywall> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(
-                    onPressed: () => LogoutDialog(),
-                    icon: Icon(Icons.close, color: Colors.white),
-                  ),
+                  // IconButton(
+                  //   onPressed: () => LogoutDialog(),
+                  //   icon: Icon(Icons.close, color: Colors.white),
+                  // ),
                   Text(
-                    'Pro',
+                    'Subscribe',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 18,

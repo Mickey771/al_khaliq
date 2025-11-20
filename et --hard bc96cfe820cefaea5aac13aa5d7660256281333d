@@ -1,0 +1,229 @@
+[33mcommit bc96cfe820cefaea5aac13aa5d7660256281333d[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m
+Author: mickeydev <etunwokefavour@gmail.com>
+Date:   Mon Nov 10 16:54:07 2025 +0100
+
+    Refactor search screen and improve performance
+    
+    - Cleaned up imports in search.dart and side_nav.dart.
+    - Simplified the Search widget constructor.
+    - Optimized the onSearchChanged method for better performance.
+    - Enhanced UI elements in search.dart for better readability.
+    - Updated navigation and interaction logic in the search results list.
+    - Improved loading indicators and error handling in API services.
+    - Refactored genre and music services to use debugPrint instead of print.
+    - Updated user services to improve response handling.
+    - Bumped version to 1.0.3+21 and updated dependencies in pubspec.lock.
+    - Added size_analysis.txt for future size tracking.
+
+[33mcommit 5e02a1b216fd2b815adb2c5472ed9f8ae8c9fa36[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Merge: ae6cef8 ac3c340
+Author: mickeydev <etunwokefavour@gmail.com>
+Date:   Wed Nov 5 23:42:16 2025 +0100
+
+    feat: Add entitlements file and update project settings
+    
+    - Added Runner.entitlements file to the Xcode project.
+    - Updated CODE_SIGN_ENTITLEMENTS in build settings to point to the new entitlements file.
+    - Added Apple Sign In capability in Info.plist.
+    - Updated various dependencies in pubspec.lock to their latest versions.
+    - Downgraded flutter_lints to version 5.0.0 in pubspec.yaml for compatibility.
+
+[33mcommit ae6cef8647caaa0ea0dbf85b9e2453bcab004949[m
+Author: mickeydev <etunwokefavour@gmail.com>
+Date:   Wed Nov 5 23:37:26 2025 +0100
+
+    fix: Update privacy and terms URLs in paywall screen; bump version to 1.0.3+20
+
+[33mcommit ac3c340405cd57bb8c25c756c155f2853077fe2e[m
+Merge: 23acada 3640826
+Author: favour Etunwoke <69763994+Mickey771@users.noreply.github.com>
+Date:   Wed Nov 5 17:22:54 2025 +0100
+
+    Merge pull request #1 from Mickey771/ios_staging
+    
+    Ios staging
+
+[33mcommit 3640826af710c732871c90c1de82459cc5bbacba[m
+Merge: 24fef16 23acada
+Author: favour Etunwoke <69763994+Mickey771@users.noreply.github.com>
+Date:   Wed Nov 5 17:22:38 2025 +0100
+
+    Merge branch 'main' into ios_staging
+
+[33mcommit 4087b28ea9e89a677bc275ae23f492213f0e29f5[m
+Author: mickeydev <etunwokefavour@gmail.com>
+Date:   Wed Nov 5 16:50:16 2025 +0100
+
+    feat: Refactor paywall screen to improve product ID handling and UI structure
+
+[33mcommit 23acadaef4574577c2e6a8738e6e1b1e6fc00523[m
+Author: mickeydev <etunwokefavour@gmail.com>
+Date:   Wed Nov 5 11:46:35 2025 +0100
+
+    feat: Implement RevenueCat subscription management
+    
+    - Added RevenueCat configuration for Android and iOS.
+    - Created SubscriptionController to manage subscription state and refresh logic.
+    - Developed CustomPaywall screen for subscription options with monthly and yearly plans.
+    - Integrated RevenueCatService for handling purchases and customer info retrieval.
+    - Updated home screen to navigate to paywall if no active subscription is found.
+    - Implemented restore purchases functionality in the paywall.
+
+[33mcommit 24fef164e07d72d0bb149264155709bf03777a15[m
+Author: Jesutoni Aderibigbe <user@Jesutoni-Aderibigbes-MacBook-Pro.local>
+Date:   Wed Sep 17 07:24:40 2025 +0100
+
+    chore: ios/info.plist apple sign in
+
+[33mcommit 5e1bc3d47416ba018ced0fcae40dc1caa1ead6c7[m
+Author: Jesutoni Aderibigbe <user@Jesutoni-Aderibigbes-MacBook-Pro.local>
+Date:   Wed Sep 17 07:18:49 2025 +0100
+
+    chore: ios/info.plist apple sign in
+
+[33mcommit 28692080a14873776c07fa1bf0788d02eeb2327b[m
+Merge: e5f5219 d8b17cb
+Author: mickeydev <etunwokefavour@gmail.com>
+Date:   Tue Sep 16 11:56:17 2025 +0100
+
+    Merge branch 'main' of https://github.com/Mickey771/al_khaliq
+
+[33mcommit e5f5219fbea5e87f4906e2376b156215b0f11a6d[m
+Author: mickeydev <etunwokefavour@gmail.com>
+Date:   Tue Sep 16 11:53:14 2025 +0100
+
+    chore: Update version to 1.0.2+14 and modify dependencies in pubspec.yaml; update google-services.json and firebase_auth_service.dart for Apple Sign In logging
+
+[33mcommit d8b17cb5fbd9f50589a05a7e7591ea51520260a1[m
+Author: Mickey771 <69763994+Mickey771@users.noreply.github.com>
+Date:   Sat Aug 23 01:24:09 2025 +0100
+
+    Update pubspec.yaml
+
+[33mcommit 03100304f9e6250553d3a2c0bb9741ba75de808b[m
+Author: Jesutoni Aderibigbe <user@Jesutoni-Aderibigbes-MacBook-Pro.local>
+Date:   Sat Aug 23 01:20:41 2025 +0100
+
+    chore: added sign in to ios/runner file
+
+[33mcommit 12c54e9932d064d838809a7060da0d7034fe06a1[m
+Author: mickeydev <etunwokefavour@gmail.com>
+Date:   Fri Aug 22 16:50:38 2025 +0100
+
+    feat: Integrate Cloud Firestore into the project and update dependencies
+
+[33mcommit ef57ff9f08357ba467aaa818d38906308cf3ff6e[m
+Author: mickeydev <etunwokefavour@gmail.com>
+Date:   Thu Aug 21 22:30:31 2025 +0100
+
+    fix: Update GIDServerClientID in Info.plist for correct web client ID
+
+[33mcommit a1fe814f9fa01b03d61c938bbb64c5f55320c5af[m
+Author: mickeydev <etunwokefavour@gmail.com>
+Date:   Thu Aug 21 21:59:57 2025 +0100
+
+    feat: Add Google Sign-in configuration to Info.plist
+
+[33mcommit 504817cd48e13cabfd1dab811d90a24f865ef32f[m
+Author: mickeydev <etunwokefavour@gmail.com>
+Date:   Thu Aug 21 15:53:16 2025 +0100
+
+    chore: Bump version to 1.0.2+9 in pubspec.yaml
+
+[33mcommit c6604601c2d60b812b705e1f5f7ab7735620304f[m
+Author: mickeydev <etunwokefavour@gmail.com>
+Date:   Thu Aug 21 15:52:11 2025 +0100
+
+    feat: Add devtools_options.yaml for Dart & Flutter DevTools settings
+
+[33mcommit c115dad6f0a6c27790294e11742ec2314afc6d7a[m
+Author: mickeydev <etunwokefavour@gmail.com>
+Date:   Thu Aug 21 14:14:02 2025 +0100
+
+    chore: Bump version to 1.0.2+8 in pubspec.yaml
+
+[33mcommit bc6f0cd78bc0b5b8ee7adb3e7e0581e0160613bb[m
+Author: mickeydev <etunwokefavour@gmail.com>
+Date:   Thu Aug 21 11:51:21 2025 +0100
+
+    chore: Update pubspec.yaml for improved dependency management
+
+[33mcommit 1cb8266714556876db15fd8be37437cd10eb69b1[m
+Author: mickeydev <etunwokefavour@gmail.com>
+Date:   Thu Aug 21 11:08:24 2025 +0100
+
+    feat: Load user data after authentication in AccountController
+
+[33mcommit eade409ec02d519baa4704c6f62c0524386ee73b[m
+Author: mickeydev <etunwokefavour@gmail.com>
+Date:   Thu Aug 21 10:45:55 2025 +0100
+
+    feat: Integrate Firebase Authentication and Google Sign-In
+    
+    - Added Firebase Authentication and Core plugins to the macOS and Windows platforms.
+    - Implemented Google Sign-In and Apple Sign-In functionality in the FirebaseAuthService.
+    - Created a WebViewPage for displaying web content.
+    - Updated pubspec.yaml to include new dependencies for Firebase, Google Sign-In, and WebView.
+    - Added app colors constants for better UI management.
+    - Generated Firebase configuration files for Android and Flutter.
+    - Updated various dependencies to their latest versions for improved performance and security.
+
+[33mcommit dd737cfebe4c0d176e9456342db6fc2b6a9d96a1[m
+Author: Mickey771 <69763994+Mickey771@users.noreply.github.com>
+Date:   Wed Aug 6 07:11:38 2025 +0100
+
+    Update pubspec.yaml for improved dependency management
+
+[33mcommit 8923e560eec9da408c440b455fe127f05a6d805c[m
+Author: Mickey771 <69763994+Mickey771@users.noreply.github.com>
+Date:   Tue Aug 5 20:10:32 2025 +0100
+
+    Reformatted Info.plist for improved readability and consistency
+
+[33mcommit 131c1629122002643d99fe283a55e1b19924d211[m
+Author: Mickey771 <69763994+Mickey771@users.noreply.github.com>
+Date:   Tue Aug 5 19:35:02 2025 +0100
+
+    fixed
+
+[33mcommit babbf8cdc1e100a89194c4be129c1457bfaa53c6[m
+Author: Mickey771 <69763994+Mickey771@users.noreply.github.com>
+Date:   Tue Aug 5 18:14:16 2025 +0100
+
+    Bundle ID updated
+
+[33mcommit 3743dc1455b8a1cb9ba9a288d5b422f07d69f9ef[m
+Author: Mickey771 <69763994+Mickey771@users.noreply.github.com>
+Date:   Tue Aug 5 14:54:25 2025 +0100
+
+    Update Codemagic configuration
+
+[33mcommit aae48c127439fe83a0f8da7e3ea14eb2dfdeefbd[m
+Author: Mickey771 <69763994+Mickey771@users.noreply.github.com>
+Date:   Mon Aug 4 00:27:43 2025 +0100
+
+    updated
+
+[33mcommit 67474422c4663bd31860c970e5d4000c43ee5a72[m
+Author: Mickey771 <69763994+Mickey771@users.noreply.github.com>
+Date:   Sun Aug 3 21:51:35 2025 +0100
+
+    Update Codemagic configuration
+
+[33mcommit cad4e390cbe50475e9ab7a64e8dc4968af7a5d25[m
+Author: Mickey771 <69763994+Mickey771@users.noreply.github.com>
+Date:   Sun Aug 3 17:52:27 2025 +0100
+
+    workspace updated
+
+[33mcommit 82d364a8b708f22f15f926d7cecd4b69020e54ab[m
+Author: Mickey771 <69763994+Mickey771@users.noreply.github.com>
+Date:   Sun Aug 3 12:26:14 2025 +0100
+
+    Update README.md
+
+[33mcommit 2fd8da39916d581f2438dc4ca9bef6eb1d1bc58d[m
+Author: Mickey Dev <etunwokefavour@gmail.com>
+Date:   Sun Aug 3 12:23:30 2025 +0100
+
+    Initial commit
