@@ -27,10 +27,10 @@ class _CustomPaywallState extends State<CustomPaywall> {
 
   // ✅ FIXED: Single source of truth for product IDs
   String get monthlyProductId =>
-      Platform.isIOS ? 'monthly_premium' : 'monthly_premium:monthlypro';
+      Platform.isIOS ? 'monthly' : 'monthly_premium:monthlypro';
 
   String get yearlyProductId =>
-      Platform.isIOS ? 'premium_yearly' : 'premium_yearly:yearly';
+      Platform.isIOS ? 'yearly' : 'premium_yearly:yearly';
 
   // Links
   final String privacyUrl = 'https://al-khaliq.info/privacy';
