@@ -105,11 +105,12 @@ class AccountController extends GetxController {
 
       final result = await FirebaseAuthService.signInWithApple();
       debugPrint('🍎 AccountController: Result from Apple Sign In: $result');
-      
+
       if (result != null) {
         if (result['email'] == null) {
           loadingStatus.value = false;
-          _handleError('Could not retrieve email. Please go to iOS Settings -> Apple ID -> Password & Security -> Apps Using Apple ID -> [App Name] -> Stop Using Apple ID, then try again.');
+          _handleError(
+              'Could not retrieve email. Please go to iOS Settings -> Apple ID -> Password & Security -> Apps Using Apple ID -> [App Name] -> Stop Using Apple ID, then try again.');
           return;
         }
 
@@ -126,7 +127,20 @@ class AccountController extends GetxController {
               _handleError('Invalid response from server');
             }
           } else {
+            // Login failed, try to register
+            debugPrint('🍎 Login failed, attempting registration...');
+
+            // Ensure we have a name
+            String nameToUse = result['name'];
+            if (nameToUse.trim().isEmpty) {
+              nameToUse = "Apple User"; // Fallback name
+              debugPrint('🍎 Name was empty, using fallback: $nameToUse');
+            }
+
             AccountServices.registerUser((regStatus, regResponse) async {
+              debugPrint('🍎 Registration Status: $regStatus');
+              debugPrint('🍎 Registration Response: $regResponse');
+
               if (regStatus) {
                 AccountServices.loginUser((loginStatus, loginResponse) async {
                   if (loginStatus) {
@@ -149,11 +163,11 @@ class AccountController extends GetxController {
                     password: 'social_login_${result['uid']}');
               } else {
                 loadingStatus.value = false;
-                _handleError('Registration failed');
+                _handleError('Registration failed: $regResponse');
               }
             },
                 email: result['email'],
-                name: result['name'],
+                name: nameToUse,
                 password: 'social_login_${result['uid']}');
           }
         }, email: result['email'], password: 'social_login_${result['uid']}');
