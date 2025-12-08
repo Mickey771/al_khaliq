@@ -351,23 +351,20 @@ class AccountController extends GetxController {
     }
 
     // Show user-friendly snackbar
-    Get.snackbar(
-      'Error',
-      errorMessage,
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.red.shade600,
-      colorText: Colors.white,
-      margin: const EdgeInsets.all(16),
-      borderRadius: 8,
-      duration: const Duration(seconds: 4),
-      isDismissible: true,
-      forwardAnimationCurve: Curves.easeOutBack,
-      reverseAnimationCurve: Curves.easeInBack,
-      icon: const Icon(
-        Icons.error_outline,
-        color: Colors.white,
-      ),
+    // Show user-friendly dialog for debugging
+    Get.defaultDialog(
+      title: 'Error',
+      middleText: errorMessage,
+      textConfirm: 'OK',
+      confirmTextColor: Colors.white,
+      onConfirm: () {
+        Get.back();
+      },
+      barrierDismissible: false,
     );
+
+    // Also keep snippet for logs
+    debugPrint('Native Error Dialog Shown: $errorMessage');
   }
 
   @override
