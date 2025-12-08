@@ -5,10 +5,7 @@
 <dict>
 <key>aps-environment</key>
     <string>development</string>
-    <key>com.apple.developer.applesignin</key>
-    <array>
-        <string>Default</string>
-    </array>
+
     <key>GIDClientID</key>
     <!-- TODO Replace this value: -->
     <!-- Copied from GoogleService-Info.plist key CLIENT_ID -->
@@ -71,10 +68,7 @@
         <string>UIInterfaceOrientationLandscapeLeft</string>
         <string>UIInterfaceOrientationLandscapeRight</string>
     </array>
-    <key>com.apple.developer.applesignin</key>
-    <array>
-        <string>Default</string>
-    </array> 
+
     <key>CADisableMinimumFrameDurationOnPhone</key>
     <true/>
     <key>UIApplicationSupportsIndirectInputEvents</key>

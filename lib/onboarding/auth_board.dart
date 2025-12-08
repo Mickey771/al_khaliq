@@ -226,51 +226,51 @@ class _AuthBoardState extends State<AuthBoard> {
                             ),
                             verticalSpace(0.02),
 
-                            // Obx(
-                            //   () => InkWell(
-                            //     onTap: () {
-                            //       accountController.signInWithApple(
-                            //           context: context);
-                            //     },
-                            //     child: Container(
-                            //       padding: EdgeInsets.fromLTRB(20, 16, 30, 16),
-                            //       margin:
-                            //           EdgeInsets.symmetric(horizontal: 43.sp),
-                            //       decoration: BoxDecoration(
-                            //         color: whiteColor,
-                            //         borderRadius: BorderRadius.circular(70.sp),
-                            //       ),
-                            //       child: Center(
-                            //         child: accountController
-                            //                     .loadingStatus.value ==
-                            //                 true
-                            //             ? LoadingAnimationWidget.stretchedDots(
-                            //                 color: Colors.white, size: 20)
-                            //             : Row(
-                            //                 mainAxisAlignment:
-                            //                     MainAxisAlignment.spaceBetween,
-                            //                 children: [
-                            //                   Image.asset(
-                            //                     'assets/images/icons/Apple.png',
-                            //                     fit: BoxFit.scaleDown,
-                            //                     scale: 22,
-                            //                   ),
-                            //                   Text("Sign up with Apple",
-                            //                       textAlign: TextAlign.center,
-                            //                       style: TextStyle(
-                            //                           fontSize: 14,
-                            //                           fontWeight:
-                            //                               FontWeight.w400,
-                            //                           color: Colors.black)),
-                            //                   horizontalSpace(0.005),
-                            //                 ],
-                            //               ),
-                            //       ),
-                            //     ),
-                            //   ),
-                            // ),
+                            Obx(
+                              () => InkWell(
+                                onTap: () {
+                                  accountController.signInWithApple(
+                                      context: context);
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.fromLTRB(20, 16, 30, 16),
+                                  margin:
+                                      EdgeInsets.symmetric(horizontal: 43.sp),
+                                  decoration: BoxDecoration(
+                                    color: whiteColor,
+                                    borderRadius: BorderRadius.circular(70.sp),
+                                  ),
+                                  child: Center(
+                                    child: accountController
+                                                .loadingStatus.value ==
+                                            true
+                                        ? LoadingAnimationWidget.stretchedDots(
+                                            color: Colors.white, size: 20)
+                                        : Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Image.asset(
+                                                'assets/images/icons/Apple.png',
+                                                fit: BoxFit.scaleDown,
+                                                scale: 22,
+                                              ),
+                                              Text("Sign up with Apple",
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                      color: Colors.black)),
+                                              horizontalSpace(0.005),
+                                            ],
+                                          ),
+                                  ),
+                                ),
+                              ),
+                            ),
 
-                            // verticalSpace(0.02),
+                            verticalSpace(0.02),
 
                             Obx(
                               () => InkWell(
