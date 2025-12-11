@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>980313543309-lo2a1faagbbrr5l6oqgqdlbifltpgqen.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.980313543309-lo2a1faagbbrr5l6oqgqdlbifltpgqen</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>980313543309-9jlpf3757vq48j9mrld5ctn2jdu2avle.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyD272lOvPZw1Fv-BOvfzx7UZtqwLcCtMyg</string>
+	<key>GCM_SENDER_ID</key>
+	<string>980313543309</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.microstatik.alKhaliq</string>
+	<key>PROJECT_ID</key>
+	<string>al-khalid</string>
+	<key>STORAGE_BUCKET</key>
+	<string>al-khalid.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:980313543309:ios:2b97edcb2ee80e4b67c8c4</string>
+	<key>DATABASE_URL</key>
+	<string>https://al-khalid-default-rtdb.firebaseio.com</string>
+</dict>
+</plist>

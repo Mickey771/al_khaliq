@@ -79,11 +79,11 @@ class FirebaseAuthService {
           AppleIDAuthorizationScopes.fullName,
         ],
         nonce: nonce,
-        webAuthenticationOptions: WebAuthenticationOptions(
+        /* webAuthenticationOptions: WebAuthenticationOptions(
           clientId: 'com.microstatik.alKhaliq.signin',
           redirectUri:
               Uri.parse('https://al-khalid.firebaseapp.com/__/auth/handler'),
-        ),
+        ), */
       );
 
       debugPrint('🟢 Apple credential received successfully');
