@@ -1,4 +1,6 @@
 import 'package:al_khaliq/controllers/user_controller.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -28,6 +30,12 @@ void main() async {
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // ✅ Initialize Supabase (Parallel Setup)
+  await Supabase.initialize(
+    url: 'https://qeoebiuqrobkcofxxcwd.supabase.co',
+    anonKey: 'sb_publishable_fhqGEeV2L1v1NikC-sDTLw_1v3DT_A1',
   );
 
   // ✅ Configure RevenueCat with anonymous user

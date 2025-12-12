@@ -12,6 +12,7 @@ import '../onboarding/login.dart';
 import '../services/account_services.dart';
 import '../services/firebase_auth_service.dart';
 import '../services/revenue_cat_service.dart';
+import '../services/supabase_auth_service.dart';
 
 class AccountController extends GetxController {
   TextEditingController get firstName => _firstName;
@@ -103,8 +104,10 @@ class AccountController extends GetxController {
     try {
       loadingStatus.value = true;
 
-      final result = await FirebaseAuthService.signInWithApple();
-      debugPrint('🍎 AccountController: Result from Apple Sign In: $result');
+      // 🍎 SWITCHED TO SUPABASE (Parallel Setup)
+      final result = await SupabaseAuthService.signInWithApple();
+      debugPrint(
+          '🍎 AccountController: Result from Supabase Apple Sign In: $result');
 
       if (result != null) {
         if (result['email'] == null) {
