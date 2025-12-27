@@ -10,11 +10,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 // import 'package:get/get_rx/src/rx_types/rx_types.dart';
 
-import '../controllers/music_controller.dart';
-import '../helpers/audio_player.dart';
-import '../helpers/back_button.dart';
-import '../helpers/constants.dart';
-import '../main.dart';
+import 'package:al_khaliq/controllers/music_controller.dart';
+import 'package:al_khaliq/helpers/audio_player.dart';
+import 'package:al_khaliq/helpers/back_button.dart';
+import 'package:al_khaliq/helpers/constants.dart';
+import 'package:al_khaliq/main.dart';
 
 class MusicPlayer extends StatefulWidget {
   final List<MediaItem>? songList;
@@ -50,10 +50,25 @@ class _MusicPlayerState extends State<MusicPlayer> {
   }
 
   Future<void> _loadPlaylist() async {
-    await audioHandler.stop(); // reset existing playback
-    await audioHandler.updateQueue(widget.songList!); // pass the whole list
-    await audioHandler
-        .loadAndPlay(widget.songList![widget.index!]); // play starting song
+    if (widget.songList == null || widget.songList!.isEmpty) {
+      debugPrint("Error: songList is empty or null");
+      return;
+    }
+    final startIndex = widget.index ?? 0;
+    if (startIndex < 0 || startIndex >= widget.songList!.length) {
+      debugPrint("Error: index $startIndex out of bounds");
+      return;
+    }
+
+    try {
+      await audioHandler.stop(); // reset existing playback
+      await audioHandler.updateQueue(widget.songList!); // pass the whole list
+      await audioHandler
+          .loadAndPlay(widget.songList![startIndex]); // play starting song
+      currentIndex.value = startIndex;
+    } catch (e) {
+      debugPrint("Error loading playlist: $e");
+    }
   }
 
   @override
@@ -75,7 +90,7 @@ class _MusicPlayerState extends State<MusicPlayer> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Color(0xFF10121f),
       ),
       child: Scaffold(
@@ -189,7 +204,7 @@ class _MusicPlayerState extends State<MusicPlayer> {
                                           padding: EdgeInsets.symmetric(
                                               horizontal: 20.sp),
                                           decoration: BoxDecoration(
-                                              color: Color(0xff23232333)
+                                              color: const Color(0xff23232333)
                                                   .withOpacity(0.2),
                                               borderRadius:
                                                   BorderRadius.circular(16.sp),
@@ -209,7 +224,9 @@ class _MusicPlayerState extends State<MusicPlayer> {
                                                       color: Colors.white
                                                           .withOpacity(0.05),
                                                     ),
-                                                    padding: EdgeInsets.all(20),
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            20),
                                                     child: Container(
                                                       decoration:
                                                           const BoxDecoration(
@@ -363,7 +380,7 @@ class _MusicPlayerState extends State<MusicPlayer> {
                                                                   .play();
                                                               statusIcon = Pause(
                                                                   buttonColor:
-                                                                      Color(
+                                                                      const Color(
                                                                           0xFFDADADA));
                                                               audioStatus =
                                                                   "Playing";
@@ -404,7 +421,7 @@ class _MusicPlayerState extends State<MusicPlayer> {
                                                         onTap: () =>
                                                             audioHandler
                                                                 .skipToNext(),
-                                                        child: IconSVG(
+                                                        child: const IconSVG(
                                                           assetPath:
                                                               'assets/images/icons/next.svg',
                                                           color: Colors.white,
@@ -453,13 +470,13 @@ class _MusicPlayerState extends State<MusicPlayer> {
                       ),
                       Align(
                         alignment: Alignment.topLeft,
-                        child: BackButtonWidget(),
+                        child: const BackButtonWidget(),
                       ),
                       Align(
                         alignment: Alignment.center,
                         child: Padding(
                           padding:
-                              EdgeInsets.fromLTRB(20.sp, 20.sp, 20.sp, 00.sp),
+                              EdgeInsets.fromLTRB(20.sp, 20.sp, 20.sp, 0.sp),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.center,
@@ -486,23 +503,27 @@ class _MusicPlayerState extends State<MusicPlayer> {
                                   ),
                                 ],
                               ),
-                              Obx(
-                                () => InkWell(
+                              Obx(() {
+                                // Access reactive variables early to ensure Obx tracks them
+                                final currentIdx = currentIndex.value;
+                                final favs = musicController.favouriteMusics;
+
+                                return InkWell(
                                   onTap: () {
-                                    musicController.favouriteMusics
-                                            .where((e) =>
-                                                e['id'] ==
-                                                widget.songs[currentIndex.value]
-                                                    ['id'])
-                                            .isNotEmpty
+                                    if (widget.songs.isEmpty ||
+                                        currentIdx >= widget.songs.length) {
+                                      return;
+                                    }
+                                    final currentSongId =
+                                        widget.songs[currentIdx]['id'];
+
+                                    favs.any((e) => e['id'] == currentSongId)
                                         ? musicController.removeFromFavourites(
                                             userController.getToken(),
-                                            widget.songs[currentIndex.value]
-                                                ['id'])
+                                            currentSongId)
                                         : musicController.addFavourites(
                                             userController.getToken(),
-                                            widget.songs[currentIndex.value]
-                                                ['id'],
+                                            currentSongId,
                                             fromPage: true);
                                   },
                                   child: Container(
@@ -519,8 +540,9 @@ class _MusicPlayerState extends State<MusicPlayer> {
                                                     horizontal: 14.sp,
                                                     vertical: 9.sp),
                                                 decoration: BoxDecoration(
-                                                    color: Color(0xFFFFFFFF)
-                                                        .withOpacity(0.09),
+                                                    color:
+                                                        const Color(0xFFFFFFFF)
+                                                            .withOpacity(0.09),
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             12.sp),
@@ -528,15 +550,16 @@ class _MusicPlayerState extends State<MusicPlayer> {
                                                         color: whiteColor
                                                             .withOpacity(0.1),
                                                         width: 1.sp)),
-                                                child: musicController
-                                                        .favouriteMusics
-                                                        .where((e) =>
+                                                child: (widget
+                                                            .songs.isNotEmpty &&
+                                                        currentIdx <
+                                                            widget
+                                                                .songs.length &&
+                                                        favs.any((e) =>
                                                             e['id'] ==
                                                             widget.songs[
-                                                                    currentIndex
-                                                                        .value]
-                                                                ['id'])
-                                                        .isNotEmpty
+                                                                    currentIdx]
+                                                                ['id']))
                                                     ? Row(
                                                         children: [
                                                           Text(
@@ -551,7 +574,7 @@ class _MusicPlayerState extends State<MusicPlayer> {
                                                             ),
                                                           ),
                                                           horizontalSpace(0.03),
-                                                          Icon(
+                                                          const Icon(
                                                             Icons.remove,
                                                             color: whiteColor,
                                                             size: 18,
@@ -572,7 +595,7 @@ class _MusicPlayerState extends State<MusicPlayer> {
                                                             ),
                                                           ),
                                                           horizontalSpace(0.03),
-                                                          Icon(
+                                                          const Icon(
                                                             Icons.add,
                                                             color: whiteColor,
                                                             size: 18,
@@ -580,8 +603,8 @@ class _MusicPlayerState extends State<MusicPlayer> {
                                                         ],
                                                       ),
                                               )))),
-                                ),
-                              )
+                                );
+                              }),
                             ],
                           ),
                         ),

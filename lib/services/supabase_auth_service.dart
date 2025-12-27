@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class SupabaseAuthService {
   static final SupabaseClient _supabase = Supabase.instance.client;
@@ -59,6 +60,58 @@ class SupabaseAuthService {
       }
     } catch (e) {
       debugPrint('🔴 Supabase Apple Sign In Error: $e');
+      rethrow;
+    }
+    return null;
+  }
+
+  // Google Sign In
+  static Future<Map<String, dynamic>?> signInWithGoogle() async {
+    try {
+      debugPrint('🔵 Starting Supabase Google Sign In...');
+
+      // 1. Trigger native Google Sign In
+      final GoogleSignIn googleSignIn = GoogleSignIn();
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+      if (googleUser == null) return null;
+
+      debugPrint('🟢 Native Google Account Received: ${googleUser.email}');
+
+      // 2. Get authentication details (idToken)
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+      final String? idToken = googleAuth.idToken;
+
+      if (idToken == null) {
+        throw 'Google ID Token is null';
+      }
+
+      debugPrint('🔵 Exchanging Google ID Token with Supabase...');
+
+      // 3. Exchange token with Supabase
+      final AuthResponse res = await _supabase.auth.signInWithIdToken(
+        provider: OAuthProvider.google,
+        idToken: idToken,
+        accessToken: googleAuth.accessToken,
+      );
+
+      final User? user = res.user;
+
+      if (user != null) {
+        debugPrint('🟢 Supabase Google Sign In Successful');
+        final String? accessToken = res.session?.accessToken;
+
+        return {
+          'user': user,
+          'idToken': accessToken, // Send session token to backend
+          'email': user.email ?? googleUser.email,
+          'name': user.userMetadata?['full_name'] ?? googleUser.displayName,
+          'uid': user.id,
+          'provider': 'supabase_google',
+        };
+      }
+    } catch (e) {
+      debugPrint('🔴 Supabase Google Sign In Error: $e');
       rethrow;
     }
     return null;

@@ -6,19 +6,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'helpers/audio_handler.dart';
-import 'onboarding/splash_screen.dart';
+import 'package:al_khaliq/helpers/audio_handler.dart';
+import 'package:al_khaliq/onboarding/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'screens/paywall/paywall_screen.dart';
-import 'controllers/subscription_controller.dart';
-import 'onboarding/login.dart';
-import 'controllers/account_controller.dart';
+import 'package:al_khaliq/controllers/subscription_controller.dart';
+import 'package:al_khaliq/onboarding/login.dart';
+import 'package:al_khaliq/controllers/account_controller.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
-import 'config/revenue_cat_config.dart';
-import 'controllers/genre_controller.dart';
-import 'controllers/music_controller.dart';
-import 'screens/views.dart';
+import 'package:al_khaliq/config/revenue_cat_config.dart';
+import 'package:al_khaliq/controllers/genre_controller.dart';
+import 'package:al_khaliq/controllers/music_controller.dart';
+import 'package:al_khaliq/controllers/playlist_controller.dart';
+import 'package:al_khaliq/screens/views.dart';
 
 late MyAudioHandler audioHandler;
 
@@ -56,8 +57,9 @@ void main() async {
   Get.put(UserController(), permanent: true);
   Get.put(AccountController(), permanent: true);
   Get.put(SubscriptionController(), permanent: true);
-  Get.put(GenreController(), permanent: true); // <-- ADD THIS
-  Get.put(MusicController(), permanent: true); // <-- AND THIS
+  Get.put(GenreController(), permanent: true);
+  Get.put(MusicController(), permanent: true);
+  Get.put(PlaylistController(), permanent: true);
   runApp(const MyApp());
 }
 

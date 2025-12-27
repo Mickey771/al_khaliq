@@ -4,11 +4,13 @@ import 'package:al_khaliq/screens/favorites.dart';
 import 'package:al_khaliq/screens/playlists/playlists.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
-import '../../helpers/constants.dart';
-import '../helpers/svg_icons.dart';
-import 'home.dart';
-import 'notifications.dart';
+import 'package:get/get.dart';
+import 'package:al_khaliq/controllers/playlist_controller.dart';
+import 'package:al_khaliq/helpers/mini_player.dart';
+import 'package:al_khaliq/helpers/constants.dart';
+import 'package:al_khaliq/helpers/svg_icons.dart';
+import 'package:al_khaliq/screens/home.dart';
+import 'package:al_khaliq/screens/notifications.dart';
 
 TabController? tabNavigationController;
 int selectedNavigationIndex = 0;
@@ -17,16 +19,19 @@ class Views extends StatefulWidget {
   const Views({super.key});
 
   @override
-  State<Views> createState() => _HomeState();
+  State<Views> createState() => _ViewsState();
 }
 
-class _HomeState extends State<Views> with TickerProviderStateMixin {
+class _ViewsState extends State<Views> with TickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+
+    if (!Get.isRegistered<PlaylistController>()) {
+      Get.put(PlaylistController(), permanent: true);
+    }
 
     tabNavigationController = TabController(
       initialIndex: 0,
@@ -136,7 +141,13 @@ class _HomeState extends State<Views> with TickerProviderStateMixin {
             ),
             Align(
               alignment: Alignment.bottomCenter,
-              child: BottomNav(),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const MiniPlayer(),
+                  BottomNav(),
+                ],
+              ),
             )
           ],
         ),
@@ -154,7 +165,7 @@ class _HomeState extends State<Views> with TickerProviderStateMixin {
               filter: ImageFilter.blur(sigmaX: 39, sigmaY: 39),
               child: Container(
                 height: height() * 0.075,
-                width: width(),
+                // width: double.infinity, // Removed to fix 99774px overflow
                 decoration: BoxDecoration(
                     color: Colors.black.withValues(alpha: 0.4),
                     borderRadius: BorderRadius.circular(16.sp),

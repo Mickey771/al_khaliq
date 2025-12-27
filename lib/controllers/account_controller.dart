@@ -29,6 +29,9 @@ class AccountController extends GetxController {
 
   RxBool loadingStatus = false.obs;
 
+  String _token = '';
+  String get token => _token;
+
   // Helper method to get or create controllers safely
   T _getOrPutController<T extends GetxController>(T Function() builder) {
     if (Get.isRegistered<T>()) {
@@ -40,8 +43,9 @@ class AccountController extends GetxController {
   Future<void> signInWithGoogle({context}) async {
     try {
       loadingStatus.value = true;
+      debugPrint('🔵 AccountController: Using Supabase for Google Sign In');
 
-      final result = await FirebaseAuthService.signInWithGoogle();
+      final result = await SupabaseAuthService.signInWithGoogle();
       if (result != null) {
         // Try to login first
         AccountServices.loginUser((status, response) async {
@@ -187,8 +191,9 @@ class AccountController extends GetxController {
     try {
       loadingStatus.value = true;
 
-      // Sign out from Firebase
+      // Sign out from Firebase and Supabase
       await FirebaseAuthService.signOut();
+      await SupabaseAuthService.signOut();
 
       // Clear SharedPreferences
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -299,30 +304,44 @@ class AccountController extends GetxController {
       debugPrint('Setting user with token: $token');
       debugPrint('User ID: $uid');
 
+      _token = token;
       userController.setToken(token);
 
-      /// >>> RevenueCat integration added here <<<
-      await RevenueCatService().updateUserId(uid);
+      // 1. Group Essential Setup (Ordered)
+      debugPrint('Step 1: Running RevenueCat Login...');
+      final customerInfo = await RevenueCatService().updateUserId(uid);
+
+      debugPrint('Step 2: Syncing Local Subscription State...');
+      // Sync local state but don't navigate yet
       final subController = Get.find<SubscriptionController>();
-      await subController.checkSubscription();
+      await subController.refreshSubscription(info: customerInfo);
 
-      /// >>> end addition <<<
-
-      await userController.getUser(token, uid);
-
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString('token', token);
-      await prefs.setString('uid', uid);
-      genreController.getGenres(token);
-      musicController.getAllSongs(token);
-      musicController.getNewReleases(token);
-      musicController.getFavourites(token);
-      playlistController.getUserPlaylists(token, uid);
+      // 2. Parallelize everything else that doesn't depend on each other
+      debugPrint('Step 3: Loading User Data and Music in parallel...');
+      await Future.wait([
+        userController.getUser(token, uid),
+        SharedPreferences.getInstance().then((prefs) async {
+          await prefs.setString('token', token);
+          await prefs.setString('uid', uid);
+        }),
+        Future.delayed(Duration.zero, () => genreController.getGenres(token)),
+        Future.delayed(
+            Duration.zero, () => musicController.getNewReleases(token)),
+        Future.delayed(
+            Duration.zero,
+            () => musicController
+                .getRecentlyPlayed(token)), // ✨ Added missing Recently Played
+        Future.delayed(
+            Duration.zero, () => musicController.getFavourites(token)),
+        Future.delayed(Duration.zero,
+            () => playlistController.getUserPlaylists(token, uid)),
+      ]);
 
       loadingStatus.value = false;
 
-      // NAVIGATION HANDLING HERE
+      // 3. Navigation happens ONCE
       if (shouldNavigate) {
+        debugPrint('Step 4: Navigating to Dashboard...');
         if (subController.hasSubscription.value) {
           Get.offAllNamed('/home');
         } else {

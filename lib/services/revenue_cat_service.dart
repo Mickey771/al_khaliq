@@ -32,8 +32,9 @@ class RevenueCatService {
     await Purchases.restorePurchases();
   }
 
-  Future<void> updateUserId(String userId) async {
-    await Purchases.logIn(userId);
+  Future<CustomerInfo> updateUserId(String userId) async {
+    final loginResult = await Purchases.logIn(userId);
     debugPrint('RevenueCat user updated to: $userId');
+    return loginResult.customerInfo;
   }
 }

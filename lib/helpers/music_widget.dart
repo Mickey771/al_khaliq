@@ -41,6 +41,8 @@ class MusicWidget extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8.sp),
                 child: CachedNetworkImage(
                   imageUrl: favorite!['image'],
+                  memCacheWidth: (height() * 0.07 * 3)
+                      .toInt(), // Cache properly sized image
                   placeholder: (context, url) => Center(
                       child: CircularProgressIndicator(
                     strokeWidth: 1,

@@ -14,6 +14,8 @@ class MusicController extends GetxController {
   RxBool loadingStatus = false.obs;
   RxBool allSongsLoadingStatus = false.obs;
   RxBool newReleasesLoadingStatus = false.obs;
+  RxBool recentlyPlayedLoadingStatus = false.obs;
+  RxBool favouriteLoadingStatus = false.obs;
 
   RxList allSongs = [].obs;
   RxList filteredSongs = [].obs;
@@ -51,29 +53,29 @@ class MusicController extends GetxController {
   }
 
   getRecentlyPlayed(token) async {
-    loadingStatus.value = true;
+    recentlyPlayedLoadingStatus.value = true;
     MusicServices.getRecentlyPlayed((status, response) {
       if (status) {
-        loadingStatus.value = false;
+        recentlyPlayedLoadingStatus.value = false;
         recentlyPlayed.value = response['data'];
       } else {
-        loadingStatus.value = false;
+        recentlyPlayedLoadingStatus.value = false;
         // showFlashError(context, response);
-        Get.back();
+        // Get.back();
       }
     }, token);
   }
 
   getFavourites(token) async {
-    loadingStatus.value = true;
+    favouriteLoadingStatus.value = true;
     MusicServices.getFavourites((status, response) {
       if (status) {
-        loadingStatus.value = false;
+        favouriteLoadingStatus.value = false;
         favouriteMusics.value = response['data'];
       } else {
-        loadingStatus.value = false;
+        favouriteLoadingStatus.value = false;
         // showFlashError(context, response);
-        Get.back();
+        // Get.back();
       }
     }, token);
   }

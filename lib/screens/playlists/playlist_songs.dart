@@ -6,10 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-import '../../controllers/user_controller.dart';
-import '../../helpers/constants.dart';
-import '../../helpers/music_widget.dart';
-import '../music_player.dart';
+import 'package:al_khaliq/controllers/user_controller.dart';
+import 'package:al_khaliq/helpers/constants.dart';
+import 'package:al_khaliq/helpers/music_widget.dart';
+import 'package:al_khaliq/screens/music_player.dart';
 
 class PlaylistSongs extends StatefulWidget {
   final int? playlistId;

@@ -45,24 +45,24 @@ class UserController extends GetxController {
       debugPrint("🔍 UserServices.getUser callback - response: $response");
 
       if (status) {
-        user.value = response;
-        debugPrint("✅ User set: ${user.value}");
+        user.assignAll(response);
+        debugPrint("✅ User set: $user");
       } else {
         debugPrint("❌ Failed to get user: $response");
-        user.value = {}; // Clear user on failure
+        user.clear(); // Clear user on failure
       }
     }, token, userId);
 
     // Wait a bit for the callback to execute
     // await Future.delayed(Duration(milliseconds: 500));
 
-    debugPrint("🔍 After getUser - user.value: ${user.value}");
+    debugPrint("🔍 After getUser - user: $user");
   }
 
   fetchUser(token) {}
 
   void setUser(Map<String, dynamic> newUser) {
-    user.value = newUser;
+    user.assignAll(newUser);
     debugPrint("User saved in controller: $newUser");
   }
 }

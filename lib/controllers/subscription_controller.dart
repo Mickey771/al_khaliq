@@ -11,12 +11,12 @@ class SubscriptionController extends GetxController {
   var customerInfo = Rxn<CustomerInfo>();
 
   // DO NOT do navigation inside here because setUser() now controls that flow
-  Future<void> refreshSubscription() async {
+  Future<void> refreshSubscription({CustomerInfo? info}) async {
     try {
       isLoading.value = true;
-      final info = await revenueCat.getCustomerInfo();
-      customerInfo.value = info;
-      hasSubscription.value = revenueCat.hasActiveSubscription(info);
+      final effectiveInfo = info ?? await revenueCat.getCustomerInfo();
+      customerInfo.value = effectiveInfo;
+      hasSubscription.value = revenueCat.hasActiveSubscription(effectiveInfo);
       debugPrint('Has subscription: ${hasSubscription.value}');
     } catch (e) {
       debugPrint('refreshSubscription error: $e');
@@ -28,8 +28,10 @@ class SubscriptionController extends GetxController {
 
   // keep this method because you may use it outside of login sequence
   // (like user manually pressing restore or subscription settings screen)
-  Future<void> checkSubscription() async {
-    await refreshSubscription();
+  // keep this method because you may use it outside of login sequence
+  // (like user manually pressing restore or subscription settings screen)
+  Future<void> checkSubscription({CustomerInfo? info}) async {
+    await refreshSubscription(info: info);
 
     if (!hasSubscription.value) {
       Get.offAllNamed('/paywall');
