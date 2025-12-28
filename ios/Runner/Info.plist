@@ -75,5 +75,11 @@
     <true/>
     <key>NSMicrophoneUsageDescription</key>
     <string>This app may access the microphone for enhanced user experience and functionality.</string>
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>audio</string>
+        <string>fetch</string>
+        <string>remote-notification</string>
+    </array>
 </dict>
 </plist>
