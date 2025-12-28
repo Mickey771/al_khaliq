@@ -71,7 +71,12 @@ class SupabaseAuthService {
       debugPrint('🔵 Starting Supabase Google Sign In...');
 
       // 1. Trigger native Google Sign In
-      final GoogleSignIn googleSignIn = GoogleSignIn();
+      // NOTE: serverClientId is its Web Client ID from Google Cloud / google-services.json
+      // It is required to get an idToken on Android.
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+        serverClientId:
+            '980313543309-f5v5tpafso25t524oap3h3mcdge06s92.apps.googleusercontent.com',
+      );
       final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
       if (googleUser == null) return null;
 
