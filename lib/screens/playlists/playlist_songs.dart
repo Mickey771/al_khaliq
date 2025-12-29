@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:al_khaliq/controllers/playlist_controller.dart';
+import 'package:al_khaliq/helpers/playlist_collage.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -102,62 +103,114 @@ class _PlaylistSongsState extends State<PlaylistSongs> {
 
             SingleChildScrollView(
               child: Padding(
-                padding: EdgeInsets.fromLTRB(10.sp, 120.sp, 10.sp, 30.sp),
+                padding: EdgeInsets.fromLTRB(10.sp, 110.sp, 10.sp, 30.sp),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      widget.playlistName!,
-                      style: TextStyle(
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.w600,
-                          color: whiteColor),
-                    ),
-                    verticalSpace(0.02),
-                    Obx(
-                      () => playlistController.playlistSongs.isEmpty
-                          ? musicWidgetLoader()
-                          : ListView.separated(
-                              padding: EdgeInsets.symmetric(horizontal: 10),
-                              physics: NeverScrollableScrollPhysics(),
-                              shrinkWrap: true,
-                              itemCount:
-                                  playlistController.playlistSongs.length,
-                              itemBuilder: (context, index) => InkWell(
-                                onTap: () {
-                                  List<MediaItem> mediaItems =
-                                      playlistController.playlistSongs
-                                          .map<MediaItem>((music) {
-                                    return MediaItem(
-                                      id: music['file'],
-                                      title: music['title'] ?? "",
-                                      artist:
-                                          music['artist'] ?? 'Unknown Artist',
-                                      displayTitle: music['title'] ?? "",
-                                      album: music['album'] ?? 'Unknown Album',
-                                      artUri: Uri.parse(music['image'] ?? ""),
-                                    );
-                                  }).toList();
+                    // Premium Header
+                    Obx(() {
+                      // Perform a read on the RxList to register dependency
+                      final songs = playlistController.playlistSongs;
+                      final isLoading = playlistController.loadingStatus.value;
 
-                                  Get.to(() => MusicPlayer(
-                                        index: index,
-                                        songList: mediaItems,
-                                        songs: playlistController.playlistSongs,
-                                      ));
-                                },
-                                child: MusicWidget(
-                                  favorite:
-                                      playlistController.playlistSongs[index],
-                                  favoriteList:
-                                      playlistController.playlistSongs,
-                                ),
-                              ),
-                              separatorBuilder: (_, __) => Divider(
-                                height: 50,
-                                thickness: 0.1,
-                                color: Colors.white,
+                      return Center(
+                        child: Column(
+                          children: [
+                            PlaylistCollage(
+                              songs: songs,
+                              size: 180.sp,
+                              borderRadius: 16,
+                            ),
+                            verticalSpace(0.02),
+                            Text(
+                              widget.playlistName!,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  fontSize: 22.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: whiteColor,
+                                  letterSpacing: 1),
+                            ),
+                            verticalSpace(0.005),
+                            isLoading && songs.isEmpty
+                                ? Text(
+                                    "Loading count...",
+                                    style: TextStyle(
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.w400,
+                                        color: lightBlueColor.withOpacity(0.5)),
+                                  )
+                                : Text(
+                                    "${songs.length} ${songs.length == 1 ? 'song' : 'songs'}",
+                                    style: TextStyle(
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.w400,
+                                        color: lightBlueColor.withOpacity(0.7)),
+                                  ),
+                          ],
+                        ),
+                      );
+                    }),
+                    verticalSpace(0.03),
+                    Obx(
+                      () {
+                        if (playlistController.loadingStatus.value &&
+                            playlistController.playlistSongs.isEmpty) {
+                          return musicWidgetLoader();
+                        }
+                        if (playlistController.playlistSongs.isEmpty) {
+                          return Padding(
+                            padding: EdgeInsets.only(top: 50.sp),
+                            child: Center(
+                              child: Text(
+                                "No songs in this playlist yet",
+                                style: TextStyle(
+                                    color: whiteColor.withOpacity(0.5),
+                                    fontSize: 14.sp),
                               ),
                             ),
+                          );
+                        }
+                        return ListView.separated(
+                          padding: EdgeInsets.symmetric(horizontal: 10),
+                          physics: NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: playlistController.playlistSongs.length,
+                          itemBuilder: (context, index) => InkWell(
+                            onTap: () {
+                              List<MediaItem> mediaItems = playlistController
+                                  .playlistSongs
+                                  .map<MediaItem>((music) {
+                                return MediaItem(
+                                  id: music['file'],
+                                  title: music['title'] ?? "",
+                                  artist: music['artist'] ?? 'Unknown Artist',
+                                  displayTitle: music['title'] ?? "",
+                                  album: music['album'] ?? 'Unknown Album',
+                                  artUri: Uri.parse(music['image'] ?? ""),
+                                  extras: {'song': music},
+                                );
+                              }).toList();
+
+                              Get.to(() => MusicPlayer(
+                                    index: index,
+                                    songList: mediaItems,
+                                    songs: playlistController.playlistSongs,
+                                  ));
+                            },
+                            child: MusicWidget(
+                              favorite: playlistController.playlistSongs[index],
+                              favoriteList: playlistController.playlistSongs,
+                              playlistId: widget.playlistId,
+                            ),
+                          ),
+                          separatorBuilder: (_, __) => Divider(
+                            height: 40.sp,
+                            thickness: 0.1,
+                            color: Colors.white10,
+                          ),
+                        );
+                      },
                     )
                   ],
                 ),

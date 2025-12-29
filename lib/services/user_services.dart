@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 import 'api_docs.dart';
@@ -9,7 +8,7 @@ import 'package:flutter/foundation.dart';
 class UserServices {
   static getUser(Function callback, token, id) async {
     var response = await ApiServices.initialiseGetRequest(
-        url: '$userUrl$id', // ✅ Correct - userUrl already has ?user_id=
+        url: userUrl, // ✅ Correct - calling /api/user with token
         token: token);
 
     debugPrint("🔍 UserServices response: ${response.toString()}");

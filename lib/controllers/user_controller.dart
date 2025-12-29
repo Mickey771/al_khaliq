@@ -14,15 +14,22 @@ class UserController extends GetxController {
 
   String _token = '';
   String _refreshToken = '';
+  String _uid = '';
 
   RxList allUsers = [].obs;
 
   String getToken() => _token;
   String getRefreshToken() => _refreshToken;
+  String getUserId() => _uid;
 
   setToken(token) {
     _token = token;
     debugPrint("=====$_token");
+  }
+
+  setUserId(uid) {
+    _uid = uid.toString();
+    debugPrint("=====User ID: $_uid");
   }
 
   setRefresh(refreshToken) => _refreshToken = refreshToken;
@@ -41,15 +48,18 @@ class UserController extends GetxController {
 
     UserServices.getUser((status, response) {
       loadingStatus.value = false;
-      debugPrint("🔍 UserServices.getUser callback - status: $status");
-      debugPrint("🔍 UserServices.getUser callback - response: $response");
+      debugPrint("🔍 UserServices.getUser response: $response");
 
       if (status) {
-        user.assignAll(response);
+        if (response is Map && response.containsKey('data')) {
+          user.assignAll(response['data']);
+        } else {
+          user.assignAll(response);
+        }
         debugPrint("✅ User set: $user");
       } else {
         debugPrint("❌ Failed to get user: $response");
-        user.clear(); // Clear user on failure
+        user.clear();
       }
     }, token, userId);
 

@@ -16,11 +16,13 @@ class MusicWidget extends StatelessWidget {
     this.isFavorite,
     this.favorite,
     this.favoriteList,
+    this.playlistId,
   });
 
   final bool? isFavorite;
   final List? favoriteList;
   final Map? favorite;
+  final int? playlistId;
 
   final MusicController musicController = Get.find();
   final UserController userController = Get.find();
@@ -100,6 +102,7 @@ class MusicWidget extends StatelessWidget {
                     builder: (context) => MusicDialog(
                       favorite: favorite,
                       favoriteList: favoriteList,
+                      playlistId: playlistId,
                     ),
                   );
           },

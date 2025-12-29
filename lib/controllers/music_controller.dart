@@ -1,6 +1,6 @@
 // import 'package:al_khaliq/services/genre_services.dart';
 import 'package:al_khaliq/services/music_services.dart';
-// import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 // import 'package:page_transition/page_transition.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
@@ -29,11 +29,16 @@ class MusicController extends GetxController {
     MusicServices.getAllSongs((status, response) {
       if (status) {
         allSongsLoadingStatus.value = false;
-        allSongs.value = response['songs'];
+        if (response is Map && response.containsKey('data')) {
+          allSongs.value = response['data'] ?? [];
+        } else if (response is List) {
+          allSongs.value = response;
+        } else {
+          debugPrint("⚠️ Unexpected response structure for allSongs");
+        }
       } else {
         allSongsLoadingStatus.value = false;
-        // showFlashError(context, response);
-        Get.back();
+        // Get.back();
       }
     }, token);
   }
@@ -57,11 +62,15 @@ class MusicController extends GetxController {
     MusicServices.getRecentlyPlayed((status, response) {
       if (status) {
         recentlyPlayedLoadingStatus.value = false;
-        recentlyPlayed.value = response['data'];
+        if (response is Map && response.containsKey('data')) {
+          recentlyPlayed.value = response['data'] ?? [];
+        } else if (response is List) {
+          recentlyPlayed.value = response;
+        } else {
+          debugPrint("⚠️ Unexpected response structure for recentlyPlayed");
+        }
       } else {
         recentlyPlayedLoadingStatus.value = false;
-        // showFlashError(context, response);
-        // Get.back();
       }
     }, token);
   }
@@ -108,6 +117,15 @@ class MusicController extends GetxController {
         loadingStatus.value = false;
         // showFlashError(context, response);
         Get.back();
+      }
+    }, token, {'id': musicId});
+  }
+
+  addRecentlyPlayed(token, musicId) async {
+    // We don't necessarily need a loading state for this background task
+    MusicServices.addRecentlyPlayed((status, response) {
+      if (status) {
+        getRecentlyPlayed(token);
       }
     }, token, {'id': musicId});
   }

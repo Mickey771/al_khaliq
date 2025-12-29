@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:al_khaliq/controllers/account_controller.dart';
 import 'package:al_khaliq/controllers/music_controller.dart';
+import 'package:al_khaliq/controllers/playlist_controller.dart';
 import 'package:al_khaliq/controllers/user_controller.dart';
 import 'package:al_khaliq/helpers/svg_icons.dart';
 import 'package:flutter/material.dart';
@@ -8,16 +9,19 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import 'constants.dart';
+import 'playlist_dialog_helper.dart';
 
 class MusicDialog extends StatelessWidget {
-  MusicDialog({this.favorite, this.favoriteList, super.key});
+  MusicDialog({this.favorite, this.favoriteList, this.playlistId, super.key});
 
   final Map? favorite;
   final List? favoriteList;
+  final int? playlistId;
 
   final MusicController musicController = Get.find();
   final AccountController accountController = Get.find();
   final UserController userController = Get.find();
+  final PlaylistController playlistController = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +43,21 @@ class MusicDialog extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                if (playlistId != null) ...[
+                  _buildMenuItem('close-circle', 'Remove from Playlist',
+                      onTap: () {
+                    playlistController.removeSongFromPlaylist(
+                      userController.getToken(),
+                      playlistId,
+                      favorite!['id'],
+                      userController.getUserId(),
+                    );
+                    Get.back();
+                  }),
+                  Divider(
+                    color: whiteColor.withOpacity(0.1),
+                  ),
+                ],
                 _buildMenuItem('close-circle', 'Remove'),
                 Divider(
                   color: whiteColor.withOpacity(0.1),
@@ -65,6 +84,13 @@ class MusicDialog extends StatelessWidget {
                             userController.getToken(), favorite!['id']);
                   }),
                 ),
+                Divider(
+                  color: whiteColor.withOpacity(0.1),
+                ),
+                _buildMenuItem('shuffle', 'Add To Playlist', onTap: () {
+                  Get.back(); // Close current dialog
+                  showPlaylistSelectionDialog(context, favorite!);
+                }),
                 Divider(
                   color: whiteColor.withOpacity(0.1),
                 ),

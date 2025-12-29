@@ -34,25 +34,41 @@ class _SearchState extends State<Search> {
 
   @override
   void initState() {
-    // TODO: implement initState
-    // loadApp();
     super.initState();
-    songs = musicController.allSongs;
+    // Senior approach: Use 'ever' worker to keep filtered list in sync with source data
+    ever(musicController.allSongs, (_) {
+      if (_searchController.text.isEmpty) {
+        musicController.filteredSongs.assignAll(musicController.allSongs);
+      }
+    });
+
+    // Initialize filtered list with all songs
+    musicController.filteredSongs.assignAll(musicController.allSongs);
+
+    // If all songs aren't loaded, load them
+    if (musicController.allSongs.isEmpty) {
+      musicController.getAllSongs(accountController.token);
+    }
   }
 
-  void onSearchChanged() {
+  void onSearchChanged(String query) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
+
+    // UI feels much better if clearing the search is instant (Senior UX)
+    if (query.isEmpty) {
+      musicController.filteredSongs.assignAll(musicController.allSongs);
+      return;
+    }
+
     _debounce = Timer(const Duration(milliseconds: 300), () {
-      final query = _searchController.text.toLowerCase();
-      if (_searchController.text.isNotEmpty) {
-        musicController.filteredSongs.value = songs
-            .where((music) => music['title'].toLowerCase().contains(query))
-            .toList();
-      } else {
-        musicController.filteredSongs.clear();
-        songs = musicController.allSongs;
-        musicController.filteredSongs.value = songs;
-      }
+      final q = query.toLowerCase().trim();
+      final results = musicController.allSongs.where((music) {
+        final title = (music['title'] as String?)?.toLowerCase() ?? "";
+        final artist = (music['artist'] as String?)?.toLowerCase() ?? "";
+        return title.contains(q) || artist.contains(q);
+      }).toList();
+
+      musicController.filteredSongs.assignAll(results);
     });
   }
 
@@ -160,6 +176,7 @@ class _SearchState extends State<Search> {
                                         album:
                                             music['album'] ?? 'Unknown Album',
                                         artUri: Uri.parse(music['image'] ?? ""),
+                                        extras: {'song': music},
                                       );
                                     }).toList();
 
@@ -223,7 +240,7 @@ class _SearchState extends State<Search> {
                                     fontWeight: FontWeight.w400,
                                     fontSize: 14.sp),
                                 onChanged: (v) {
-                                  onSearchChanged();
+                                  onSearchChanged(v);
                                 },
                                 controller: _searchController,
                                 decoration: InputDecoration(
@@ -231,6 +248,20 @@ class _SearchState extends State<Search> {
                                     Icons.search,
                                     color: whiteColor,
                                   ),
+                                  suffixIcon: _searchController.text.isNotEmpty
+                                      ? GestureDetector(
+                                          onTap: () {
+                                            _searchController.clear();
+                                            onSearchChanged("");
+                                            setState(() {});
+                                          },
+                                          child: Icon(
+                                            Icons.clear,
+                                            color: whiteColor,
+                                            size: 20.sp,
+                                          ),
+                                        )
+                                      : null,
                                   hintText: 'Search Here',
                                   border: InputBorder.none,
                                   contentPadding: EdgeInsets.only(top: 10.sp),

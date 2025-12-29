@@ -137,6 +137,7 @@ class GenreSongs extends StatelessWidget {
                                     displayTitle: music['title'] ?? "",
                                     album: music['album'] ?? 'Unknown Album',
                                     artUri: Uri.parse(music['image'] ?? ""),
+                                    extras: {'song': music},
                                   );
                                 }).toList();
 

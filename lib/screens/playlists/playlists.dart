@@ -8,6 +8,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../helpers/constants.dart';
+import '../../helpers/music_widget.dart';
+import '../../helpers/playlist_collage.dart';
 import '../../helpers/svg_icons.dart';
 import '../search.dart';
 import '../side_nav.dart';
@@ -22,6 +24,13 @@ class Playlists extends StatefulWidget {
 class _PlaylistsState extends State<Playlists> {
   PlaylistController playlistController = Get.find();
   UserController userController = Get.find();
+
+  @override
+  void initState() {
+    super.initState();
+    playlistController.getUserPlaylists(
+        userController.getToken(), userController.getUserId());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,77 +99,149 @@ class _PlaylistsState extends State<Playlists> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     verticalSpace(0.01),
-                    Text(
-                      "Playlists",
-                      style: TextStyle(
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.w600,
-                          color: whiteColor),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Playlists",
+                          style: TextStyle(
+                              fontSize: 18.sp,
+                              fontWeight: FontWeight.w600,
+                              color: whiteColor),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            _showCreatePlaylistDialog(context);
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(5.sp),
+                            decoration: BoxDecoration(
+                                color: whiteColor.withOpacity(0.1),
+                                shape: BoxShape.circle),
+                            child: Icon(
+                              Icons.add,
+                              color: whiteColor,
+                              size: 24.sp,
+                            ),
+                          ),
+                        )
+                      ],
                     ),
                     verticalSpace(0.02),
-                    ListView.separated(
-                        padding: EdgeInsets.symmetric(horizontal: 10),
-                        physics: NeverScrollableScrollPhysics(),
-                        separatorBuilder: (_, __) => Divider(
-                              height: 50,
-                              thickness: 0.1,
-                              color: Colors.grey,
-                            ),
-                        shrinkWrap: true,
-                        itemCount: playlistController.userPlayLists.length,
-                        itemBuilder: (context, index) => InkWell(
-                              onTap: () {
-                                Get.to(() => PlaylistSongs(
-                                      playlistId: playlistController
-                                          .userPlayLists[index]['id'],
-                                      playlistName: playlistController
-                                          .userPlayLists[index]['name'],
-                                    ));
-                              },
-                              child: Column(
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                    Obx(() => playlistController.loadingStatus.value &&
+                            playlistController.userPlayLists.isEmpty
+                        ? musicWidgetLoader()
+                        : ListView.separated(
+                            padding: EdgeInsets.symmetric(horizontal: 10),
+                            physics: NeverScrollableScrollPhysics(),
+                            separatorBuilder: (_, __) => Divider(
+                                  height: 30.sp,
+                                  thickness: 0.1,
+                                  color: Colors.white10,
+                                ),
+                            shrinkWrap: true,
+                            itemCount: playlistController.userPlayLists.length,
+                            itemBuilder: (context, index) {
+                              var playlist =
+                                  playlistController.userPlayLists[index];
+                              return InkWell(
+                                onTap: () {
+                                  Get.to(() => PlaylistSongs(
+                                        playlistId: playlist['id'],
+                                        playlistName: playlist['name'],
+                                      ));
+                                },
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 8.sp),
+                                  child: Row(
                                     children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            playlistController
-                                                .userPlayLists[index]['name'],
-                                            style: TextStyle(
-                                                fontSize: 15.sp,
-                                                fontWeight: FontWeight.w600,
-                                                color: whiteColor),
+                                      // Collage cover on the left
+                                      PlaylistCollage(
+                                        songs: playlist['songs'] ?? [],
+                                        size: 60.sp,
+                                        borderRadius: 12,
+                                      ),
+                                      horizontalSpace(0.04),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              playlist['name'] ?? "",
+                                              style: TextStyle(
+                                                  fontSize: 16.sp,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: whiteColor,
+                                                  letterSpacing: 0.5),
+                                            ),
+                                            verticalSpace(0.005),
+                                            Text(
+                                              "${playlist['songs_count'] ?? 0} ${playlist['songs_count'] == 1 ? 'song' : 'songs'} • ${playlist['description'] ?? "No description"}",
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                  fontSize: 12.sp,
+                                                  fontWeight: FontWeight.w400,
+                                                  color: lightBlueColor
+                                                      .withOpacity(0.7)),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      PopupMenuButton<String>(
+                                        icon: Icon(
+                                          Icons.more_vert,
+                                          color: whiteColor.withOpacity(0.5),
+                                          size: 22.sp,
+                                        ),
+                                        onSelected: (value) {
+                                          if (value == 'rename') {
+                                            _showRenamePlaylistDialog(
+                                                context, playlist);
+                                          } else if (value == 'delete') {
+                                            _showDeleteConfirmationDialog(
+                                                context, playlist);
+                                          }
+                                        },
+                                        color: Color(0xFF1c1f2e),
+                                        itemBuilder: (context) => [
+                                          PopupMenuItem(
+                                            value: 'rename',
+                                            child: Row(
+                                              children: [
+                                                Icon(Icons.edit,
+                                                    color: whiteColor,
+                                                    size: 18.sp),
+                                                horizontalSpace(0.02),
+                                                Text("Rename",
+                                                    style: TextStyle(
+                                                        color: whiteColor)),
+                                              ],
+                                            ),
                                           ),
-                                          verticalSpace(0.007),
-                                          Text(
-                                            playlistController
-                                                    .userPlayLists[index]
-                                                ['description'],
-                                            style: TextStyle(
-                                                fontSize: 11.sp,
-                                                fontWeight: FontWeight.w500,
-                                                color: lightBlueColor),
+                                          PopupMenuItem(
+                                            value: 'delete',
+                                            child: Row(
+                                              children: [
+                                                Icon(Icons.delete,
+                                                    color: Colors.redAccent,
+                                                    size: 18.sp),
+                                                horizontalSpace(0.02),
+                                                Text("Delete",
+                                                    style: TextStyle(
+                                                        color:
+                                                            Colors.redAccent)),
+                                              ],
+                                            ),
                                           ),
                                         ],
                                       ),
-                                      Icon(
-                                        Icons.arrow_forward_ios,
-                                        color: lightBlueColor,
-                                      )
                                     ],
                                   ),
-                                  Divider(
-                                    height: 40.sp,
-                                    color: whiteColor.withValues(alpha: 0.4),
-                                    thickness: 0.5,
-                                  )
-                                ],
-                              ),
-                            )),
+                                ),
+                              );
+                            })),
                   ],
                 ),
               ),
@@ -249,6 +330,144 @@ class _PlaylistsState extends State<Playlists> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showCreatePlaylistDialog(BuildContext context) {
+    String name = "";
+    String description = "";
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Color(0xFF10121f),
+        title: Text("Create Playlist", style: TextStyle(color: whiteColor)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              style: TextStyle(color: whiteColor),
+              onChanged: (v) => name = v,
+              decoration: InputDecoration(
+                hintText: "Playlist Name",
+                hintStyle: TextStyle(color: whiteColor.withOpacity(0.5)),
+                enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: whiteColor.withOpacity(0.5))),
+              ),
+            ),
+            verticalSpace(0.02),
+            TextField(
+              style: TextStyle(color: whiteColor),
+              onChanged: (v) => description = v,
+              decoration: InputDecoration(
+                hintText: "Description (Optional)",
+                hintStyle: TextStyle(color: whiteColor.withOpacity(0.5)),
+                enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: whiteColor.withOpacity(0.5))),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("Cancel", style: TextStyle(color: lightBlueColor)),
+          ),
+          TextButton(
+            onPressed: () {
+              if (name.isNotEmpty) {
+                playlistController.createPlaylist(
+                  userController.getToken(),
+                  userController.getUserId(),
+                  name,
+                  description,
+                );
+              } else {
+                Get.snackbar("Error", "Playlist name cannot be empty",
+                    snackPosition: SnackPosition.BOTTOM,
+                    backgroundColor: Colors.red.withOpacity(0.7),
+                    colorText: whiteColor);
+              }
+            },
+            child: Text("Create", style: TextStyle(color: whiteColor)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showRenamePlaylistDialog(BuildContext context, dynamic playlist) {
+    String newName = playlist['name'] ?? "";
+    TextEditingController controller = TextEditingController(text: newName);
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Color(0xFF10121f),
+        title: Text("Rename Playlist", style: TextStyle(color: whiteColor)),
+        content: TextField(
+          controller: controller,
+          style: TextStyle(color: whiteColor),
+          onChanged: (v) => newName = v,
+          decoration: InputDecoration(
+            hintText: "New Playlist Name",
+            hintStyle: TextStyle(color: whiteColor.withOpacity(0.5)),
+            enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: whiteColor.withOpacity(0.5))),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("Cancel", style: TextStyle(color: lightBlueColor)),
+          ),
+          TextButton(
+            onPressed: () {
+              if (newName.isNotEmpty) {
+                playlistController.renamePlaylist(
+                  userController.getToken(),
+                  playlist['id'],
+                  newName,
+                  userController.getUserId(),
+                );
+                Navigator.pop(context);
+              }
+            },
+            child: Text("Rename", style: TextStyle(color: whiteColor)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDeleteConfirmationDialog(BuildContext context, dynamic playlist) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Color(0xFF10121f),
+        title: Text("Delete Playlist", style: TextStyle(color: Colors.red)),
+        content: Text(
+          "Are you sure you want to delete '${playlist['name']}'? This action cannot be undone.",
+          style: TextStyle(color: whiteColor),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("Cancel", style: TextStyle(color: lightBlueColor)),
+          ),
+          TextButton(
+            onPressed: () {
+              playlistController.deletePlaylist(
+                userController.getToken(),
+                playlist['id'],
+                userController.getUserId(),
+              );
+              Navigator.pop(context);
+            },
+            child: Text("Delete", style: TextStyle(color: Colors.red)),
+          ),
+        ],
       ),
     );
   }

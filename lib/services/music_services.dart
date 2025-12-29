@@ -74,4 +74,14 @@ class MusicServices {
       callback(true, response);
     }
   }
+
+  static addRecentlyPlayed(Function callback, token, data) async {
+    var response = await ApiServices.initialisePostRequest(
+        data: data, url: addRecentlyPlayedUrl, token: token);
+    if (response is String) {
+      callback(false, response);
+    } else {
+      callback(true, response);
+    }
+  }
 }

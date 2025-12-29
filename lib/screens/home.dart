@@ -194,6 +194,7 @@ class _HomeState extends State<Home> {
                                     title: m['title'] ?? "",
                                     artist: m['artist'] ?? 'Unknown Artist',
                                     artUri: Uri.parse(m['image'] ?? ""),
+                                    extras: {'song': m},
                                   );
                                 }).toList();
 
@@ -234,102 +235,111 @@ class _HomeState extends State<Home> {
                     padding: EdgeInsets.symmetric(horizontal: 10.sp),
                     child: SizedBox(
                       height: height() * 0.21,
-                      child: musicController.recentlyPlayed.isNotEmpty
-                          ? ListView.builder(
-                              padding: EdgeInsets.zero,
-                              scrollDirection: Axis.horizontal,
-                              itemCount: musicController.recentlyPlayed.length,
-                              itemBuilder: (context, index) {
-                                final song =
-                                    musicController.recentlyPlayed[index];
-                                return Padding(
-                                  padding: EdgeInsets.only(right: 20.sp),
-                                  child: InkWell(
-                                    onTap: () {
-                                      List<MediaItem> mediaItems =
-                                          musicController.recentlyPlayed
-                                              .map<MediaItem>((m) {
-                                        return MediaItem(
-                                          id: m['file'] ?? '',
-                                          title: m['title'] ?? "",
-                                          artist:
-                                              m['artist'] ?? 'Unknown Artist',
-                                          artUri: Uri.parse(m['image'] ?? ""),
-                                        );
-                                      }).toList();
+                      child: musicController.recentlyPlayedLoadingStatus.value
+                          ? genreWidgetLoader()
+                          : musicController.recentlyPlayed.isNotEmpty
+                              ? ListView.builder(
+                                  padding: EdgeInsets.zero,
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount:
+                                      musicController.recentlyPlayed.length,
+                                  itemBuilder: (context, index) {
+                                    final song =
+                                        musicController.recentlyPlayed[index];
+                                    return Padding(
+                                      padding: EdgeInsets.only(right: 20.sp),
+                                      child: InkWell(
+                                        onTap: () {
+                                          List<MediaItem> mediaItems =
+                                              musicController.recentlyPlayed
+                                                  .map<MediaItem>((m) {
+                                            return MediaItem(
+                                              id: m['file'] ?? '',
+                                              title: m['title'] ?? "",
+                                              artist: m['artist'] ??
+                                                  'Unknown Artist',
+                                              artUri:
+                                                  Uri.parse(m['image'] ?? ""),
+                                              extras: {'song': m},
+                                            );
+                                          }).toList();
 
-                                      Get.to(() => MusicPlayer(
-                                            index: index,
-                                            songList: mediaItems,
-                                            songs:
-                                                musicController.recentlyPlayed,
-                                          ));
-                                    },
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Hero(
-                                          tag: "recent_${song['image']}",
-                                          child: SizedBox(
-                                            height: height() * 0.17,
-                                            width: height() * 0.17,
-                                            child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(8.sp),
-                                              child: CachedNetworkImage(
-                                                imageUrl: song['image'] ?? "",
-                                                memCacheWidth:
-                                                    (height() * 0.17 * 3)
-                                                        .toInt(),
-                                                placeholder: (context, url) =>
-                                                    Center(
-                                                        child:
-                                                            CircularProgressIndicator(
-                                                  strokeWidth: 1,
-                                                  color: whiteColor,
-                                                )),
-                                                errorWidget:
-                                                    (context, url, error) =>
-                                                        Icon(
-                                                  Icons.error,
-                                                  color: whiteColor,
+                                          Get.to(() => MusicPlayer(
+                                                index: index,
+                                                songList: mediaItems,
+                                                songs: musicController
+                                                    .recentlyPlayed,
+                                              ));
+                                        },
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Hero(
+                                              tag: "recent_${song['image']}",
+                                              child: SizedBox(
+                                                height: height() * 0.17,
+                                                width: height() * 0.17,
+                                                child: ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          8.sp),
+                                                  child: CachedNetworkImage(
+                                                    imageUrl:
+                                                        song['image'] ?? "",
+                                                    memCacheWidth:
+                                                        (height() * 0.17 * 3)
+                                                            .toInt(),
+                                                    placeholder: (context,
+                                                            url) =>
+                                                        Center(
+                                                            child:
+                                                                CircularProgressIndicator(
+                                                      strokeWidth: 1,
+                                                      color: whiteColor,
+                                                    )),
+                                                    errorWidget:
+                                                        (context, url, error) =>
+                                                            Icon(
+                                                      Icons.error,
+                                                      color: whiteColor,
+                                                    ),
+                                                    fit: BoxFit.cover,
+                                                  ),
                                                 ),
-                                                fit: BoxFit.cover,
                                               ),
                                             ),
-                                          ),
+                                            verticalSpace(0.005),
+                                            SizedBox(
+                                              width: height() * 0.17,
+                                              child: Text(
+                                                song['title'] ??
+                                                    song['name'] ??
+                                                    "Unknown",
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                    color: whiteColor,
+                                                    fontSize: 14.sp,
+                                                    fontWeight:
+                                                        FontWeight.w500),
+                                              ),
+                                            )
+                                          ],
                                         ),
-                                        verticalSpace(0.005),
-                                        SizedBox(
-                                          width: height() * 0.17,
-                                          child: Text(
-                                            song['title'] ??
-                                                song['name'] ??
-                                                "Unknown",
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
-                                                color: whiteColor,
-                                                fontSize: 14.sp,
-                                                fontWeight: FontWeight.w500),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
-                            )
-                          : Center(
-                              child: Text(
-                              "No Recently Played\nSong",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  color: whiteColor,
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 14.sp),
-                            )),
+                                      ),
+                                    );
+                                  },
+                                )
+                              : Center(
+                                  child: Text(
+                                  "No Recently Played\nSong",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: whiteColor,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 14.sp),
+                                )),
                     ),
                   ),
                 ),

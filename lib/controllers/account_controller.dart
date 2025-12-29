@@ -306,6 +306,7 @@ class AccountController extends GetxController {
 
       _token = token;
       userController.setToken(token);
+      userController.setUserId(uid);
 
       // 1. Group Essential Setup (Ordered)
       debugPrint('Step 1: Running RevenueCat Login...');
@@ -317,7 +318,8 @@ class AccountController extends GetxController {
       await subController.refreshSubscription(info: customerInfo);
 
       // 2. Parallelize everything else that doesn't depend on each other
-      debugPrint('Step 3: Loading User Data and Music in parallel...');
+      // 2. Critical Setup (Awaited for Home UI)
+      debugPrint('Step 3: Loading critical Home data...');
       await Future.wait([
         userController.getUser(token, uid),
         SharedPreferences.getInstance().then((prefs) async {
@@ -327,21 +329,25 @@ class AccountController extends GetxController {
         Future.delayed(Duration.zero, () => genreController.getGenres(token)),
         Future.delayed(
             Duration.zero, () => musicController.getNewReleases(token)),
+      ]);
+
+      // 3. Background Setup (Non-blocking)
+      debugPrint('Step 4: Starting background data sync...');
+      Future.wait([
         Future.delayed(
-            Duration.zero,
-            () => musicController
-                .getRecentlyPlayed(token)), // ✨ Added missing Recently Played
+            Duration.zero, () => musicController.getRecentlyPlayed(token)),
         Future.delayed(
             Duration.zero, () => musicController.getFavourites(token)),
+        Future.delayed(Duration.zero, () => musicController.getAllSongs(token)),
         Future.delayed(Duration.zero,
             () => playlistController.getUserPlaylists(token, uid)),
       ]);
 
       loadingStatus.value = false;
 
-      // 3. Navigation happens ONCE
+      // 4. Navigation happens ONCE
       if (shouldNavigate) {
-        debugPrint('Step 4: Navigating to Dashboard...');
+        debugPrint('Step 5: Navigating to Dashboard...');
         if (subController.hasSubscription.value) {
           Get.offAllNamed('/home');
         } else {

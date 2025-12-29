@@ -31,7 +31,9 @@ class MiniPlayer extends StatelessWidget {
                   index >= 0 &&
                   index < queue.length) {
                 Get.to(() => MusicPlayer(
-                      songs: const [], // The player handles queue from audioHandler
+                      songs: queue
+                          .map((m) => m.extras?['song'] as Map? ?? {})
+                          .toList(),
                       songList: queue,
                       index: index,
                     ));
