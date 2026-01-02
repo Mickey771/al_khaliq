@@ -55,7 +55,9 @@ class SupabaseAuthService {
               '${appleCredential.givenName ?? ''} ${appleCredential.familyName ?? ''}'
                   .trim(),
           'uid': user.id,
-          'provider': 'supabase_apple', // Marker for backend
+          'provider': 'supabase_apple',
+          'avatar':
+              user.userMetadata?['avatar_url'] ?? user.userMetadata?['picture'],
         };
       }
     } catch (e) {
@@ -113,6 +115,9 @@ class SupabaseAuthService {
           'name': user.userMetadata?['full_name'] ?? googleUser.displayName,
           'uid': user.id,
           'provider': 'supabase_google',
+          'avatar': user.userMetadata?['avatar_url'] ??
+              user.userMetadata?['picture'] ??
+              googleUser.photoUrl,
         };
       }
     } catch (e) {

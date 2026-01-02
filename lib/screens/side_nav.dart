@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:al_khaliq/screens/web_view.dart';
+import 'package:al_khaliq/services/review_service.dart';
 
 class SideNav extends StatelessWidget {
   SideNav({super.key});
@@ -60,10 +61,29 @@ class SideNav extends StatelessWidget {
                         color: Colors.grey,
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(
-                        Icons.person,
-                        color: Colors.white,
-                        size: 35.sp,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(50),
+                        child: userController.user['avatar'] != null &&
+                                userController.user['avatar']
+                                    .toString()
+                                    .isNotEmpty
+                            ? Image.network(
+                                userController.user['avatar'],
+                                width: 35.sp,
+                                height: 35.sp,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    Icon(
+                                  Icons.person,
+                                  color: Colors.white,
+                                  size: 35.sp,
+                                ),
+                              )
+                            : Icon(
+                                Icons.person,
+                                color: Colors.white,
+                                size: 35.sp,
+                              ),
                       ),
                     ),
                     horizontalSpace(0.05),
@@ -110,13 +130,14 @@ class SideNav extends StatelessWidget {
                                 url: "https://www.al-khaliq.info/terms"));
                             break;
                           case 2:
-                            // Implement rate app functionality
+                            // Native Review Prompt
+                            ReviewService.requestReview();
                             break;
                           case 3:
+                            // Get Help Link
                             Get.to(() => WebViewPage(
-                                  title: "Rate App",
-                                  url:
-                                      "https://play.google.com/store/apps/details?id=com.al_khaliq.app",
+                                  title: "Get Help",
+                                  url: "https://al-khaliq.info",
                                 ));
                             break;
                           case 4:
@@ -128,7 +149,7 @@ class SideNav extends StatelessWidget {
                           case 6:
                             Get.to(() => WebViewPage(
                                 title: "Delete My Data",
-                                url: "https:forms.gle/cKPv9mVpYdWeFWE88"));
+                                url: "https://forms.gle/cKPv9mVpYdWeFWE88"));
                             break;
                         }
                       },

@@ -16,6 +16,7 @@ class AccountServices {
     required String email,
     required String name,
     required String firebaseUid,
+    String? avatar,
   }) async {
     try {
       debugPrint('🔐 Social Login - Provider: $provider, Email: $email');
@@ -26,6 +27,7 @@ class AccountServices {
         "email": email,
         "name": name,
         "firebase_uid": firebaseUid,
+        "avatar": avatar,
       };
 
       var response = await ApiServices.initialisePostRequest(
@@ -123,6 +125,7 @@ class AccountServices {
     required String email,
     required String password,
     required String name,
+    String? avatar,
   }) async {
     try {
       debugPrint('📝 Register User - Email: $email, Name: $name');
@@ -132,6 +135,7 @@ class AccountServices {
         "password": password,
         "name": name,
         "password_confirmation": password,
+        "avatar": avatar,
       };
 
       debugPrint('Registration data prepared, sending request...');

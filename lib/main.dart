@@ -1,5 +1,6 @@
 import 'package:al_khaliq/controllers/user_controller.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:al_khaliq/services/version_service.dart';
 
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
@@ -60,6 +61,10 @@ void main() async {
   Get.put(GenreController(), permanent: true);
   Get.put(MusicController(), permanent: true);
   Get.put(PlaylistController(), permanent: true);
+
+  // Trigger update check in background
+  VersionService.checkUpdate();
+
   runApp(const MyApp());
 }
 

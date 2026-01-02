@@ -92,6 +92,7 @@ class AccountController extends GetxController {
             },
                 email: result['email'],
                 name: result['name'],
+                avatar: result['avatar'],
                 password: 'social_login_${result['uid']}');
           }
         }, email: result['email'], password: 'social_login_${result['uid']}');
@@ -175,6 +176,7 @@ class AccountController extends GetxController {
             },
                 email: result['email'],
                 name: nameToUse,
+                avatar: result['avatar'],
                 password: 'social_login_${result['uid']}');
           }
         }, email: result['email'], password: 'social_login_${result['uid']}');
