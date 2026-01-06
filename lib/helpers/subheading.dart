@@ -25,7 +25,7 @@ class SubHeading extends StatelessWidget {
           ),
           InkWell(
             onTap: () {
-              seeAllFunc;
+              seeAllFunc?.call();
             },
             child: Text(
               'See all',

@@ -47,6 +47,21 @@ class AccountController extends GetxController {
 
       final result = await SupabaseAuthService.signInWithGoogle();
       if (result != null) {
+        // 🔄 Migrate Avatar to Supabase Storage
+        String avatarUrl = result['avatar'] ?? "";
+        if (avatarUrl.isNotEmpty) {
+          debugPrint('📸 Migrating Google avatar to Supabase Storage...');
+          final supabaseAvatarUrl =
+              await SupabaseAuthService.uploadAvatarFromUrl(
+            avatarUrl,
+            result['uid'],
+          );
+          if (supabaseAvatarUrl != null) {
+            avatarUrl = supabaseAvatarUrl;
+            debugPrint('✅ Google avatar migrated: $avatarUrl');
+          }
+        }
+
         // Try to login first
         AccountServices.loginUser((status, response) async {
           if (status) {
@@ -92,7 +107,7 @@ class AccountController extends GetxController {
             },
                 email: result['email'],
                 name: result['name'],
-                avatar: result['avatar'],
+                avatar: avatarUrl,
                 password: 'social_login_${result['uid']}');
           }
         }, email: result['email'], password: 'social_login_${result['uid']}');
@@ -120,6 +135,21 @@ class AccountController extends GetxController {
           _handleError(
               'Could not retrieve email. Please go to iOS Settings -> Apple ID -> Password & Security -> Apps Using Apple ID -> [App Name] -> Stop Using Apple ID, then try again.');
           return;
+        }
+
+        // 🔄 Migrate Avatar to Supabase Storage
+        String avatarUrl = result['avatar'] ?? "";
+        if (avatarUrl.isNotEmpty) {
+          debugPrint('📸 Migrating Apple avatar to Supabase Storage...');
+          final supabaseAvatarUrl =
+              await SupabaseAuthService.uploadAvatarFromUrl(
+            avatarUrl,
+            result['uid'],
+          );
+          if (supabaseAvatarUrl != null) {
+            avatarUrl = supabaseAvatarUrl;
+            debugPrint('✅ Apple avatar migrated: $avatarUrl');
+          }
         }
 
         AccountServices.loginUser((status, response) async {
@@ -176,7 +206,7 @@ class AccountController extends GetxController {
             },
                 email: result['email'],
                 name: nameToUse,
-                avatar: result['avatar'],
+                avatar: avatarUrl,
                 password: 'social_login_${result['uid']}');
           }
         }, email: result['email'], password: 'social_login_${result['uid']}');

@@ -78,42 +78,56 @@ class GenreSongs extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
-                    height: height() * 0.23,
-                    width: width(),
-                    child: Hero(
-                      tag: image!,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8.sp),
-                        child: CachedNetworkImage(
-                          imageUrl: image!,
-                          placeholder: (context, url) =>
-                              CircularProgressIndicator(),
-                          errorWidget: (context, url, error) => Icon(
-                            Icons.error,
-                            color: whiteColor,
+                  if (image != null && image!.isNotEmpty)
+                    SizedBox(
+                      height: height() * 0.23,
+                      width: width(),
+                      child: Hero(
+                        tag: image!,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8.sp),
+                          child: CachedNetworkImage(
+                            imageUrl: image!,
+                            placeholder: (context, url) => const Center(
+                              child:
+                                  CircularProgressIndicator(color: whiteColor),
+                            ),
+                            errorWidget: (context, url, error) => Icon(
+                              Icons.music_note,
+                              color: whiteColor,
+                              size: 50.sp,
+                            ),
+                            fit: BoxFit.cover,
                           ),
-                          fit: BoxFit.cover,
                         ),
                       ),
-                    ),
-                  ),
+                    )
+                  else
+                    verticalSpace(0.08), // Spacing for back button if no image
                   verticalSpace(0.015),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20.sp),
-                    child: Hero(
-                      tag: name!,
-                      child: Material(
-                        color: Colors.transparent,
-                        child: Text(
-                          name!,
-                          style: TextStyle(
-                              color: whiteColor,
-                              fontSize: 22.sp,
-                              fontWeight: FontWeight.w600),
-                        ),
-                      ),
-                    ),
+                    child: (name != null && name!.isNotEmpty)
+                        ? Hero(
+                            tag: name!,
+                            child: Material(
+                              color: Colors.transparent,
+                              child: Text(
+                                name!,
+                                style: TextStyle(
+                                    color: whiteColor,
+                                    fontSize: 22.sp,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          )
+                        : Text(
+                            "Songs",
+                            style: TextStyle(
+                                color: whiteColor,
+                                fontSize: 22.sp,
+                                fontWeight: FontWeight.w600),
+                          ),
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:http/http.dart' as http;
 
 class SupabaseAuthService {
   static final SupabaseClient _supabase = Supabase.instance.client;
@@ -135,5 +136,32 @@ class SupabaseAuthService {
   // Sign out (only Supabase session)
   static Future<void> signOut() async {
     await _supabase.auth.signOut();
+  }
+
+  /// Downloads an image from a URL and uploads it to Supabase Storage.
+  /// Returns the public URL of the uploaded avatar.
+  static Future<String?> uploadAvatarFromUrl(String url, String userId) async {
+    try {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final bytes = response.bodyBytes;
+        final fileName = '$userId.png';
+
+        // Upload to the 'avatars' bucket
+        await _supabase.storage.from('avatars').uploadBinary(
+              fileName,
+              bytes,
+              fileOptions:
+                  const FileOptions(contentType: 'image/png', upsert: true),
+            );
+
+        final String publicUrl =
+            _supabase.storage.from('avatars').getPublicUrl(fileName);
+        return publicUrl;
+      }
+    } catch (e) {
+      debugPrint('Error uploading avatar to Supabase: $e');
+    }
+    return null;
   }
 }

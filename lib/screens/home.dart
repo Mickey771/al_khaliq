@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:al_khaliq/controllers/genre_controller.dart';
 import 'package:al_khaliq/controllers/music_controller.dart';
+import 'package:al_khaliq/screens/genre/allGenres.dart';
 import 'package:al_khaliq/screens/genre/genreSongs.dart';
 import 'package:al_khaliq/screens/music_player.dart';
 import 'package:al_khaliq/screens/search.dart';
@@ -68,7 +69,9 @@ class _HomeState extends State<Home> {
                       verticalSpace(0.035),
                       SubHeading(
                         subtitle: "Music Genre",
-                        seeAllFunc: () {},
+                        seeAllFunc: () {
+                          Get.to(() => const AllGenres());
+                        },
                       ),
                       Obx(() => genreController.genreLoadingStatus.value ==
                               false
@@ -167,7 +170,19 @@ class _HomeState extends State<Home> {
                       verticalSpace(0.025),
                       SubHeading(
                         subtitle: "New Releases",
-                        seeAllFunc: () {},
+                        seeAllFunc: () async {
+                          if (musicController.allSongs.isEmpty) {
+                            await musicController
+                                .getAllSongs(accountController.token);
+                          }
+                          Get.to(() => GenreSongs(
+                                songs: musicController.allSongs,
+                                name: "All Music",
+                                image: musicController.newReleases.isNotEmpty
+                                    ? musicController.newReleases[0]['image']
+                                    : null,
+                              ));
+                        },
                       ),
                     ],
                   ),
@@ -225,7 +240,15 @@ class _HomeState extends State<Home> {
                   padding: EdgeInsets.fromLTRB(10.sp, 20.sp, 10.sp, 10.sp),
                   child: SubHeading(
                     subtitle: "Recently Played",
-                    seeAllFunc: () {},
+                    seeAllFunc: () {
+                      if (musicController.recentlyPlayed.isNotEmpty) {
+                        Get.to(() => GenreSongs(
+                              songs: musicController.recentlyPlayed,
+                              name: "Recently Played",
+                              image: musicController.recentlyPlayed[0]['image'],
+                            ));
+                      }
+                    },
                   ),
                 ),
               ),

@@ -16,7 +16,10 @@ class PlaylistController extends GetxController {
   RxBool loadingStatus = false.obs;
 
   RxList userPlayLists = [].obs;
-  RxList playlistSongs = [].obs;
+  RxList playlistSongs =
+      [].obs; // Deprecated, but keeping for compatibility if needed
+  RxMap<int, List> songsCache = <int, List>{}.obs;
+
   RxList recentlyPlayed = [].obs;
   RxList favouriteMusics = [].obs;
 
@@ -35,12 +38,22 @@ class PlaylistController extends GetxController {
 
         // Senior approach: Merge fetched data with local truth (preserve songs & precise counts)
         for (var newPlaylist in fetched) {
-          var oldPlaylist = userPlayLists
-              .firstWhereOrNull((p) => p['id'] == newPlaylist['id']);
-          if (oldPlaylist != null && oldPlaylist.containsKey('songs')) {
-            newPlaylist['songs'] = oldPlaylist['songs'];
-            // Prefer the length of the actual song list as the source of truth
-            newPlaylist['songs_count'] = (oldPlaylist['songs'] as List).length;
+          final int id = newPlaylist['id'];
+
+          // Priority 1: Check the dedicated multi-playlist songsCache
+          if (songsCache.containsKey(id)) {
+            newPlaylist['songs'] = songsCache[id];
+            newPlaylist['songs_count'] = songsCache[id]!.length;
+          }
+          // Priority 2: Check the old userPlayLists list (stale session data)
+          else {
+            var oldPlaylist =
+                userPlayLists.firstWhereOrNull((p) => p['id'] == id);
+            if (oldPlaylist != null && oldPlaylist.containsKey('songs')) {
+              newPlaylist['songs'] = oldPlaylist['songs'];
+              newPlaylist['songs_count'] =
+                  (oldPlaylist['songs'] as List).length;
+            }
           }
         }
 
@@ -50,9 +63,9 @@ class PlaylistController extends GetxController {
   }
 
   getPlaylistSongs(token, playlistId) async {
-    // Senior approach: Don't clear the list if we already have data (Stale-while-revalidate)
-    // This removes the "blank screen" lag perception.
-    if (playlistSongs.isEmpty) {
+    // 🚀 Senior optimization: Stale-while-revalidate
+    // No full screen loader if we already have data for this specific playlist
+    if (!songsCache.containsKey(playlistId)) {
       loadingStatus.value = true;
     }
 
@@ -72,15 +85,17 @@ class PlaylistController extends GetxController {
           fetchedSongs = response;
         }
 
-        playlistSongs.assignAll(fetchedSongs);
+        // Update the specific cache for this playlist
+        songsCache[playlistId] = fetchedSongs;
+        playlistSongs
+            .assignAll(fetchedSongs); // Keep old list updated for safety
 
-        // Senior approach: Patch the local userPlayLists to keep counts & covers in sync
+        // Update the main list's count and song reference
         int index = userPlayLists.indexWhere((p) => p['id'] == playlistId);
         if (index != -1) {
           userPlayLists[index]['songs_count'] = fetchedSongs.length;
           userPlayLists[index]['songs'] = fetchedSongs;
-          userPlayLists
-              .refresh(); // Crucial for GetX to trigger UI update for Map items
+          userPlayLists.refresh();
         }
       }
     }, token, playlistId);
@@ -166,11 +181,18 @@ class PlaylistController extends GetxController {
   }
 
   addSongToPlaylist(token, playlistId, musicId, userId) async {
+    // ⚡ Optimistic Update: Increment UI count immediately
+    int playlistIdx = userPlayLists.indexWhere((p) => p['id'] == playlistId);
+    if (playlistIdx != -1) {
+      userPlayLists[playlistIdx]['songs_count'] =
+          (userPlayLists[playlistIdx]['songs_count'] ?? 0) + 1;
+      userPlayLists.refresh();
+    }
+
     loadingStatus.value = true;
     PlaylistServices.addSongToPlaylist((status, response) {
       loadingStatus.value = false;
       if (status) {
-        // Refresh both lists to keep counts and UI in sync
         getPlaylistSongs(token, playlistId);
         getUserPlaylists(token, userId);
 
@@ -178,8 +200,15 @@ class PlaylistController extends GetxController {
         Get.snackbar("Success", "Song added to playlist",
             snackPosition: SnackPosition.BOTTOM,
             backgroundColor: Get.theme.primaryColor.withOpacity(0.7),
-            colorText: Get.theme.colorScheme.onPrimary);
+            colorText: Get.theme.colorScheme.onPrimary,
+            duration: const Duration(seconds: 1));
       } else {
+        // 🔄 Rollback on error
+        if (playlistIdx != -1) {
+          userPlayLists[playlistIdx]['songs_count'] =
+              (userPlayLists[playlistIdx]['songs_count'] ?? 1) - 1;
+          userPlayLists.refresh();
+        }
         Get.snackbar("Error", response.toString(),
             snackPosition: SnackPosition.BOTTOM,
             backgroundColor: Colors.red.withOpacity(0.7),
@@ -189,17 +218,38 @@ class PlaylistController extends GetxController {
   }
 
   removeSongFromPlaylist(token, playlistId, musicId, userId) async {
+    // ⚡ Optimistic Update: Decrement UI count immediately
+    int playlistIdx = userPlayLists.indexWhere((p) => p['id'] == playlistId);
+    if (playlistIdx != -1) {
+      int currentCount = userPlayLists[playlistIdx]['songs_count'] ?? 1;
+      userPlayLists[playlistIdx]['songs_count'] =
+          currentCount > 0 ? currentCount - 1 : 0;
+
+      // Also remove from cache if exists
+      if (songsCache.containsKey(playlistId)) {
+        songsCache[playlistId]!.removeWhere((s) => s['id'] == musicId);
+        songsCache.refresh();
+      }
+      userPlayLists.refresh();
+    }
+
     loadingStatus.value = true;
     PlaylistServices.removeSongFromPlaylist((status, response) {
       loadingStatus.value = false;
       if (status) {
-        // Refresh both lists to keep counts and UI in sync
         getPlaylistSongs(token, playlistId);
         getUserPlaylists(token, userId);
 
         Get.snackbar("Success", "Song removed from playlist",
-            snackPosition: SnackPosition.BOTTOM);
+            snackPosition: SnackPosition.BOTTOM,
+            duration: const Duration(seconds: 1));
       } else {
+        // 🔄 Rollback count on error
+        if (playlistIdx != -1) {
+          userPlayLists[playlistIdx]['songs_count'] =
+              (userPlayLists[playlistIdx]['songs_count'] ?? 0) + 1;
+          userPlayLists.refresh();
+        }
         Get.snackbar("Error", response.toString(),
             snackPosition: SnackPosition.BOTTOM,
             backgroundColor: Colors.red.withOpacity(0.7),

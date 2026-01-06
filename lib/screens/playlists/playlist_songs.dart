@@ -109,8 +109,10 @@ class _PlaylistSongsState extends State<PlaylistSongs> {
                   children: [
                     // Premium Header
                     Obx(() {
-                      // Perform a read on the RxList to register dependency
-                      final songs = playlistController.playlistSongs;
+                      // 🚀 Get songs from the multi-playlist cache
+                      final songs =
+                          playlistController.songsCache[widget.playlistId] ??
+                              [];
                       final isLoading = playlistController.loadingStatus.value;
 
                       return Center(
@@ -154,11 +156,16 @@ class _PlaylistSongsState extends State<PlaylistSongs> {
                     verticalSpace(0.03),
                     Obx(
                       () {
-                        if (playlistController.loadingStatus.value &&
-                            playlistController.playlistSongs.isEmpty) {
+                        final songs =
+                            playlistController.songsCache[widget.playlistId] ??
+                                [];
+                        final isLoading =
+                            playlistController.loadingStatus.value;
+
+                        if (isLoading && songs.isEmpty) {
                           return musicWidgetLoader();
                         }
-                        if (playlistController.playlistSongs.isEmpty) {
+                        if (songs.isEmpty) {
                           return Padding(
                             padding: EdgeInsets.only(top: 50.sp),
                             child: Center(
@@ -172,15 +179,14 @@ class _PlaylistSongsState extends State<PlaylistSongs> {
                           );
                         }
                         return ListView.separated(
-                          padding: EdgeInsets.symmetric(horizontal: 10),
-                          physics: NeverScrollableScrollPhysics(),
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          physics: const NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
-                          itemCount: playlistController.playlistSongs.length,
+                          itemCount: songs.length,
                           itemBuilder: (context, index) => InkWell(
                             onTap: () {
-                              List<MediaItem> mediaItems = playlistController
-                                  .playlistSongs
-                                  .map<MediaItem>((music) {
+                              List<MediaItem> mediaItems =
+                                  songs.map<MediaItem>((music) {
                                 return MediaItem(
                                   id: music['file'],
                                   title: music['title'] ?? "",
@@ -195,12 +201,12 @@ class _PlaylistSongsState extends State<PlaylistSongs> {
                               Get.to(() => MusicPlayer(
                                     index: index,
                                     songList: mediaItems,
-                                    songs: playlistController.playlistSongs,
+                                    songs: songs,
                                   ));
                             },
                             child: MusicWidget(
-                              favorite: playlistController.playlistSongs[index],
-                              favoriteList: playlistController.playlistSongs,
+                              favorite: songs[index],
+                              favoriteList: songs,
                               playlistId: widget.playlistId,
                             ),
                           ),
